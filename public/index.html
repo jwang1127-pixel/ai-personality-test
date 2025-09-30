@@ -607,32 +607,28 @@
 
         // Airtable API函数
         async function sendToAirtable(data) {
-            const url = `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableId}`;
-            
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        fields: data
-                    })
-                });
+    try {
+        const response = await fetch('/api/submit-test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
 
-                if (response.ok) {
-                    console.log('数据已成功发送到Airtable');
-                    return true;
-                } else {
-                    console.error('发送到Airtable失败:', response.status);
-                    return false;
-                }
-            } catch (error) {
-                console.error('发送到Airtable时出错:', error);
-                return false;
-            }
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('数据已成功保存，记录ID:', result.recordId);
+            window.airtableRecordId = result.recordId;
         }
+        
+        return result.success;
+    } catch (error) {
+        console.error('发送数据时出错:', error);
+        return false;
+    }
+}
 
         // 用户信息收集功能
         function validateUserInfo() {

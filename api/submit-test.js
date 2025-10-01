@@ -1,5 +1,6 @@
-module.exports = async (req, res) => {
-  // 添加 CORS 头
+const https = require('https');
+
+module.exports = (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -12,62 +13,63 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    console.log('Received request body:', JSON.stringify(req.body));
-    
-    const data = req.body;
-    
-    const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
-    const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-    const AIRTABLE_TABLE_ID = process.env.AIRTABLE_TABLE_ID;
-    
-    console.log('Environment variables check:', {
-      hasApiKey: !!AIRTABLE_API_KEY,
-      hasBaseId: !!AIRTABLE_BASE_ID,
-      hasTableId: !!AIRTABLE_TABLE_ID
-    });
+  const data = req.body;
+  
+  const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
+  const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+  const AIRTABLE_TABLE_ID = process.env.AIRTABLE_TABLE_ID;
 
-    if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID || !AIRTABLE_TABLE_ID) {
-      console.error('Missing environment variables');
-      return res.status(500).json({
-        success: false,
-        error: 'Server configuration error'
-      });
+  const postData = JSON.stringify({ fields: data });
+
+  const options = {
+    hostname: 'api.airtable.com',
+    path: `/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`,
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(postData)
     }
+  };
 
-    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`;
-    console.log('Calling Airtable URL:', url);
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ fields: data })
-    });
-
-    const result = await response.json();
-    console.log('Airtable response status:', response.status);
-    console.log('Airtable response:', JSON.stringify(result));
-
-    if (response.ok) {
-      return res.status(200).json({
-        success: true,
-        recordId: result.id
-      });
-    } else {
-      return res.status(response.status).json({
-        success: false,
-        error: result
-      });
-    }
+  const request = https.request(options, (response) => {
+    let body = '';
     
-  } catch (error) {
-    console.error('Caught error:', error.message, error.stack);
-    return res.status(500).json({
+    response.on('data', (chunk) => {
+      body += chunk;
+    });
+    
+    response.on('end', () => {
+      try {
+        const result = JSON.parse(body);
+        
+        if (response.statusCode === 200) {
+          res.status(200).json({
+            success: true,
+            recordId: result.id
+          });
+        } else {
+          res.status(response.statusCode).json({
+            success: false,
+            error: result
+          });
+        }
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          error: 'Failed to parse response'
+        });
+      }
+    });
+  });
+
+  request.on('error', (error) => {
+    res.status(500).json({
       success: false,
       error: error.message
     });
-  }
+  });
+
+  request.write(postData);
+  request.end();
 };

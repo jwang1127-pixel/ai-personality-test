@@ -1,6 +1,8 @@
 const https = require('https');
 
 module.exports = (req, res) => {
+  console.log('Request body:', JSON.stringify(req.body));
+  
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -49,9 +51,12 @@ module.exports = (req, res) => {
             recordId: result.id
           });
         } else {
+          console.error('Airtable error:', response.statusCode, body);
           res.status(response.statusCode).json({
             success: false,
-            error: result
+            error: result,
+            statusCode: response.statusCode,
+            rawError: body
           });
         }
       } catch (error) {

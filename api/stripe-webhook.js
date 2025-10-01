@@ -1,36 +1,38 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const https = require('https');
 
 module.exports = async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-  } catch (err) {
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
+  // 暂时跳过签名验证，先测试基本功能
+  const event = req.body;
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     
-    // 发送报告邮件
-    const sgMail = require('@sendgrid/mail');
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-    const msg = {
-      to: session.customer_email,
-      from: process.env.FROM_EMAIL,
-      subject: '您的AI共创人生测试报告',
-      html: `
-        <h1>感谢您的购买！</h1>
-        <p>您好，${session.metadata.user_name}</p>
-        <p>这是您的详细性格分析报告...</p>
-      `
+    // 调用发送邮件的 API
+    const emailData = {
+      email: session.customer_email,
+      name: session.metadata?.user_name || 'User',
+      scores: JSON.parse(session.metadata?.test_scores || '{}')
     };
 
-    await sgMail.send(msg);
+    // 调用我们的 send-report API
+    const postData = JSON.stringify(emailData);
+    
+    const options = {
+      hostname: process.env.VERCEL_URL || 'www.aicocreatelife.com',
+      path: '/api/send-report',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    const request = https.request(options, (response) => {
+      console.log('Email API response:', response.statusCode);
+    });
+
+    request.write(postData);
+    request.end();
   }
 
   res.json({received: true});

@@ -821,76 +821,124 @@
         }
 
         async function purchaseReport() {
-            await updatePurchaseIntent('Report');
-            
-            const message = `您好！我想购买AI共创人生性格测试详细分析报告。
-
-我的信息：
-姓名：${userData.name}
-邮箱：${userData.email}
-年龄段：${userData.age}
-
-产品：详细性格分析报告 - $19
-包含：个性化分析报告，具体行动建议和资源推荐
-
-期待收到详细报告！`;
-            
-            alert('购买信息已记录，我们会在24小时内联系您完成付款和发送报告！\n\n' + message);
-            
-            console.log('报告购买请求:', { 
-                user: userData, 
-                product: 'detailed_report', 
-                price: 19 
-            });
+    if (!window.airtableRecordId) {
+        alert('请先完成测试后再购买报告');
+        return;
+    }
+    
+    await updatePurchaseIntent('Report', window.airtableRecordId);
+    
+    try {
+        const response = await fetch('/api/create-stripe-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                product_name: '详细性格分析报告',
+                description: 'AI共创人生 - 个性化分析报告',
+                amount: 1900, // $19.00
+                email: userData.email,
+                name: userData.name,
+                age_group: userData.age,
+                product_type: 'report',
+                scores: testScores,
+                base_url: window.location.origin
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.location.href = result.url;
+        } else {
+            alert('创建支付失败，请重试或联系客服');
         }
+    } catch (error) {
+        console.error('支付创建失败:', error);
+        alert('网络错误，请稍后重试');
+    }
+}
 
         async function bookConsultation() {
-            await updatePurchaseIntent('Consultation');
-            
-            const message = `您好！我想预约AI共创人生个性化咨询服务。
-
-我的信息：
-姓名：${userData.name}
-邮箱：${userData.email}
-年龄段：${userData.age}
-
-服务：个性化人生设计咨询 - $99
-包含：2-3小时深度咨询，详细报告和行动计划
-
-期待与王博士的深度交流！`;
-            
-            alert('预约信息已记录，我们会在24小时内联系您安排咨询时间！\n\n' + message);
-            
-            console.log('咨询预约请求:', { 
-                user: userData, 
-                service: 'consultation', 
-                price: 99 
-            });
+    if (!window.airtableRecordId) {
+        alert('请先完成测试后再预约咨询');
+        return;
+    }
+    
+    await updatePurchaseIntent('Consultation', window.airtableRecordId);
+    
+    try {
+        const response = await fetch('/api/create-stripe-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                product_name: '个性化人生设计咨询',
+                description: '2-3小时深度咨询，详细报告和行动计划',
+                amount: 9900, // $99.00
+                email: userData.email,
+                name: userData.name,
+                age_group: userData.age,
+                product_type: 'consultation',
+                scores: testScores,
+                base_url: window.location.origin
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.location.href = result.url;
+        } else {
+            alert('创建预约失败，请重试或联系客服');
         }
+    } catch (error) {
+        console.error('预约创建失败:', error);
+        alert('网络错误，请稍后重试');
+    }
+}}
 
         async function joinWorkshop() {
-            await updatePurchaseIntent('Workshop');
-            
-            const message = `您好！我想报名AI共创人生工坊。
-
-我的信息：
-姓名：${userData.name}
-邮箱：${userData.email}
-年龄段：${userData.age}
-
-服务：AI共创人生工坊 - $199
-包含：半天工坊，小组共创体验
-
-期待参与工坊活动！`;
-            
-            alert('报名信息已记录，我们会在24小时内联系您确认工坊时间和地点！\n\n' + message);
-            
-            console.log('工坊报名请求:', { 
-                user: userData, 
-                service: 'workshop', 
-                price: 199 
-            });
+    if (!window.airtableRecordId) {
+        alert('请先完成测试后再报名工作坊');
+        return;
+    }
+    
+    await updatePurchaseIntent('Workshop', window.airtableRecordId);
+    
+    try {
+        const response = await fetch('/api/create-stripe-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                product_name: 'AI共创人生工作坊',
+                description: '半天工作坊，小组共创体验',
+                amount: 19900, // $199.00
+                email: userData.email,
+                name: userData.name,
+                age_group: userData.age,
+                product_type: 'workshop',
+                scores: testScores,
+                base_url: window.location.origin
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.location.href = result.url;
+        } else {
+            alert('创建报名失败，请重试或联系客服');
         }
+    } catch (error) {
+        console.error('报名创建失败:', error);
+        alert('网络错误，请稍后重试');
+    }
+}
 
         function displayResults(scores) {
             const resultsContent = document.getElementById('resultsContent');

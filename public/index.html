@@ -894,13 +894,14 @@
         } else {
             alert('创建预约失败，请重试或联系客服');
         }
-    } catch (error) {
-        console.error('预约创建失败:', error);
-        alert('网络错误，请稍后重试');
+        } catch (error) {
+            console.error('预约创建失败:', error);
+            alert('网络错误，请稍后重试');
+        }
     }
-
-
-        async function joinWorkshop() {
+    
+    
+            async function joinWorkshop() {
     if (!window.airtableRecordId) {
         alert('请先完成测试后再报名工作坊');
         return;

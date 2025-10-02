@@ -1,6 +1,6 @@
-const https = require('https');
+import { request as _request } from 'https';
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   // 暂时跳过签名验证，先测试基本功能
   const event = req.body;
 
@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
       }
     };
 
-    const request = https.request(options, (response) => {
+    const request = _request(options, (response) => {
       console.log('Email API response:', response.statusCode);
     });
 

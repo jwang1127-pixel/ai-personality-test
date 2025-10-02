@@ -1,9 +1,10 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
 module.exports = async (req, res) => {
   console.log('Environment check:');
   console.log('STRIPE_SECRET_KEY exists:', !!process.env.STRIPE_SECRET_KEY);
   console.log('Key preview:', process.env.STRIPE_SECRET_KEY?.substring(0, 15));
+  console.log('All env keys:', Object.keys(process.env).filter(k => k.includes('STRIPE')));
+  
+  const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
   
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');

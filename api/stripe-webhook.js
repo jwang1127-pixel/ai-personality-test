@@ -35,33 +35,47 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
 
-  // 处理 checkout.session.completed 事件
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
+  // 处理支付成功事件
+  if (event.type === 'checkout.session.completed' || event.type === 'payment_intent.succeeded') {
+    let customerEmail;
     
-    console.log('💰 Payment successful!');
-    console.log('Session ID:', session.id);
-    console.log('Customer details:', JSON.stringify(session.customer_details, null, 2));
-
-    // 获取客户邮箱
-    const customerEmail = session.customer_details?.email;
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object;
+      console.log('💰 Checkout session completed!');
+      console.log('Session ID:', session.id);
+      console.log('Session data:', JSON.stringify(session, null, 2));
+      customerEmail = session.customer_details?.email;
+    } else if (event.type === 'payment_intent.succeeded') {
+      const paymentIntent = event.data.object;
+      console.log('💰 Payment intent succeeded!');
+      console.log('Payment Intent ID:', paymentIntent.id);
+      console.log('Payment Intent data:', JSON.stringify(paymentIntent, null, 2));
+      
+      // 从 payment_intent 获取邮箱 - 多种方式尝试
+      customerEmail = paymentIntent.receipt_email || 
+                     paymentIntent.metadata?.email ||
+                     paymentIntent.shipping?.email;
+      
+      // 如果还是没有邮箱，尝试从 charges 获取
+      if (!customerEmail && paymentIntent.charges?.data?.[0]) {
+        customerEmail = paymentIntent.charges.data[0].billing_details?.email;
+      }
+    }
 
     console.log('Customer email:', customerEmail);
 
     if (customerEmail) {
       try {
         console.log('📧 Attempting to send email to:', customerEmail);
-        
-        // 发送邮件
         await sendReportEmail(customerEmail);
-        
         console.log('✅ Report email sent successfully to:', customerEmail);
       } catch (emailError) {
         console.error('❌ Failed to send email:', emailError.message);
         console.error('Email error stack:', emailError.stack);
       }
     } else {
-      console.error('❌ No customer email found in session');
+      console.error('❌ No customer email found in payment data');
+      console.error('Please check Stripe Dashboard to see what data is available');
     }
   } else {
     console.log('ℹ️  Event type not handled:', event.type);

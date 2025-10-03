@@ -1,6 +1,6 @@
 const https = require('https');
 
-export default async (req, res) => {
+module.exports = async (req, res) => {
   // 暂时跳过签名验证，先测试基本功能
   const event = req.body;
 

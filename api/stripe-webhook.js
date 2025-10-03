@@ -1,5 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const nodemailer = require('nodemailer');
+const buffer = require('micro').buffer;
 
 module.exports = async (req, res) => {
   // 只接受 POST 请求
@@ -13,8 +14,20 @@ module.exports = async (req, res) => {
   let event;
 
   try {
+    // 获取原始 body - 尝试多种方式
+    let rawBody;
+    
+    if (Buffer.isBuffer(req.body)) {
+      rawBody = req.body;
+    } else if (typeof req.body === 'string') {
+      rawBody = req.body;
+    } else {
+      // 如果 body 已经被解析，尝试重新序列化
+      rawBody = JSON.stringify(req.body);
+    }
+
     // 验证 webhook 签名
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
@@ -37,7 +50,6 @@ module.exports = async (req, res) => {
         console.log('Report email sent successfully to:', customerEmail);
       } catch (emailError) {
         console.error('Failed to send email:', emailError);
-        // 不要因为邮件失败而返回错误，支付已经成功
       }
     } else {
       console.error('No customer email found in session');
@@ -50,7 +62,6 @@ module.exports = async (req, res) => {
 
 // 发送报告邮件的函数
 async function sendReportEmail(toEmail) {
-  // 配置 SendGrid SMTP
   const transporter = nodemailer.createTransport({
     host: 'smtp.sendgrid.net',
     port: 587,

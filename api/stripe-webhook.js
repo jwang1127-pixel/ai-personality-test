@@ -18,7 +18,7 @@ export default async (req, res) => {
     const postData = JSON.stringify(emailData);
     
     const options = {
-      hostname: process.env.VERCEL_URL || 'www.aicocreatelife.com',
+      hostname: 'www.aicocreatelife.com',
       path: '/api/send-report',
       method: 'POST',
       headers: {

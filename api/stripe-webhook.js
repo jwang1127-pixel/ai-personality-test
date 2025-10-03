@@ -8,6 +8,14 @@ export default async (req, res) => {
     const session = event.data.object;
     
     // 调用发送邮件的 API
+console.log('Environment check:', {
+  SENDGRID_API_KEY: process.env.SENDGRID_API_KEY ? 'exists' : 'missing',
+  FROM_EMAIL: process.env.FROM_EMAIL,
+  TO_EMAIL: process.env.TO_EMAIL,
+  allKeys: Object.keys(process.env)
+});
+
+const emailData = {// 调用发送邮件的 API
     const emailData = {
       email: session.customer_email,
       name: session.metadata?.user_name || 'User',

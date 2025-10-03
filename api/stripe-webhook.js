@@ -1,4 +1,4 @@
-import { request as _request } from 'https';
+const https = require('https');
 
 export default async (req, res) => {
   // 暂时跳过签名验证，先测试基本功能
@@ -35,7 +35,7 @@ const emailData = {// 调用发送邮件的 API
       }
     };
 
-    const request = _request(options, (response) => {
+    const request = https.request(options, (response) => {
       console.log('Email API response:', response.statusCode);
     });
 

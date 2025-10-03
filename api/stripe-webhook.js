@@ -6,7 +6,6 @@ module.exports = async (req, res) => {
   console.log('=== Webhook received ===');
   console.log('Method:', req.method);
   
-  // 只接受 POST 请求
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -20,13 +19,10 @@ module.exports = async (req, res) => {
   let event;
 
   try {
-    // 读取原始 body
     const rawBody = await getRawBody(req);
     const bodyString = rawBody.toString('utf8');
-
     console.log('Raw body length:', bodyString.length);
 
-    // 验证 webhook 签名
     event = stripe.webhooks.constructEvent(bodyString, sig, webhookSecret);
     console.log('✅ Signature verified successfully');
     console.log('Event type:', event.type);
@@ -35,53 +31,75 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
 
-  // 处理支付成功事件
-  if (event.type === 'checkout.session.completed' || event.type === 'payment_intent.succeeded') {
-    let customerEmail;
+  let customerEmail;
+
+  // 处理 checkout.session.completed 事件
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    console.log('💰 Checkout session completed!');
+    console.log('Session ID:', session.id);
     
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
-      console.log('💰 Checkout session completed!');
-      console.log('Session ID:', session.id);
-      console.log('Session data:', JSON.stringify(session, null, 2));
-      customerEmail = session.customer_details?.email;
-    } else if (event.type === 'payment_intent.succeeded') {
-      const paymentIntent = event.data.object;
-      console.log('💰 Payment intent succeeded!');
-      console.log('Payment Intent ID:', paymentIntent.id);
-      console.log('Payment Intent data:', JSON.stringify(paymentIntent, null, 2));
-      
-      // 从 payment_intent 获取邮箱 - 多种方式尝试
-      customerEmail = paymentIntent.receipt_email || 
-                     paymentIntent.metadata?.email ||
-                     paymentIntent.shipping?.email;
-      
-      // 如果还是没有邮箱，尝试从 charges 获取
-      if (!customerEmail && paymentIntent.charges?.data?.[0]) {
-        customerEmail = paymentIntent.charges.data[0].billing_details?.email;
-      }
+    customerEmail = session.customer_email || session.customer_details?.email;
+    
+    // 如果还没有邮箱，从 metadata 获取
+    if (!customerEmail && session.metadata?.user_email) {
+      customerEmail = session.metadata.user_email;
     }
-
-    console.log('Customer email:', customerEmail);
-
-    if (customerEmail) {
+    
+    console.log('Customer email from session:', customerEmail);
+  }
+  
+  // 处理 payment_intent.succeeded 事件
+  else if (event.type === 'payment_intent.succeeded') {
+    const paymentIntent = event.data.object;
+    console.log('💰 Payment intent succeeded!');
+    console.log('Payment Intent ID:', paymentIntent.id);
+    
+    // 尝试从 payment_intent 的 metadata 获取邮箱
+    if (paymentIntent.metadata?.user_email) {
+      customerEmail = paymentIntent.metadata.user_email;
+      console.log('Customer email from payment intent metadata:', customerEmail);
+    }
+    
+    // 如果还是没有，尝试通过 payment_intent 查找对应的 checkout session
+    if (!customerEmail) {
       try {
-        console.log('📧 Attempting to send email to:', customerEmail);
-        await sendReportEmail(customerEmail);
-        console.log('✅ Report email sent successfully to:', customerEmail);
-      } catch (emailError) {
-        console.error('❌ Failed to send email:', emailError.message);
-        console.error('Email error stack:', emailError.stack);
+        console.log('Attempting to find checkout session for payment intent...');
+        
+        const sessions = await stripe.checkout.sessions.list({
+          payment_intent: paymentIntent.id,
+          limit: 1
+        });
+        
+        if (sessions.data.length > 0) {
+          const session = sessions.data[0];
+          console.log('Found checkout session:', session.id);
+          customerEmail = session.customer_email || session.customer_details?.email || session.metadata?.user_email;
+          console.log('Customer email from found session:', customerEmail);
+        } else {
+          console.log('No checkout session found for this payment intent');
+        }
+      } catch (searchError) {
+        console.error('Error searching for checkout session:', searchError.message);
       }
-    } else {
-      console.error('❌ No customer email found in payment data');
-      console.error('Please check Stripe Dashboard to see what data is available');
     }
-  } else {
-    console.log('ℹ️  Event type not handled:', event.type);
   }
 
-  // 返回成功响应
+  // 发送邮件
+  if (customerEmail) {
+    try {
+      console.log('📧 Attempting to send email to:', customerEmail);
+      await sendReportEmail(customerEmail);
+      console.log('✅ Report email sent successfully to:', customerEmail);
+    } catch (emailError) {
+      console.error('❌ Failed to send email:', emailError.message);
+      console.error('Email error stack:', emailError.stack);
+    }
+  } else {
+    console.error('❌ No customer email found');
+    console.error('Event type was:', event.type);
+  }
+
   console.log('=== Webhook processing complete ===');
   res.status(200).json({ received: true });
 };
@@ -113,11 +131,11 @@ async function sendReportEmail(toEmail) {
     `
   };
 
-  console.log('📬 Sending email with options:', JSON.stringify(mailOptions, null, 2));
+  console.log('📬 Sending email to:', toEmail);
 
   const result = await transporter.sendMail(mailOptions);
   
-  console.log('📧 Email sent result:', JSON.stringify(result, null, 2));
+  console.log('📧 Email sent successfully!');
   
   return result;
 }

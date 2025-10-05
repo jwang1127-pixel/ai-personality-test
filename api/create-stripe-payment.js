@@ -35,7 +35,7 @@ module.exports = async (req, res) => {
         quantity: 1
       }],
       mode: 'payment',
-      success_url: `${base_url}?success=true`,
+      success_url: `${base_url}/success.html?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}&product=${product_type}&amount=${amount}&email=${email}`,
       cancel_url: `${base_url}?cancelled=true`,
       customer_email: email,
       metadata: {

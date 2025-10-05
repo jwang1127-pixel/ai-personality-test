@@ -1,10 +1,11 @@
 {
   "name": "biorhythm-calculator",
   "version": "1.0.0",
-  "description": "Biorhythm Calculator with Stripe Payment",
+  "description": "AI Co-create Life Personality Assessment",
   "dependencies": {
     "stripe": "^14.0.0",
-    "nodemailer": "^6.9.7",
+    "@sendgrid/mail": "^8.0.0",
+    "airtable": "^0.12.0",
     "micro": "^10.0.1",
     "raw-body": "^2.5.2"
   }

@@ -59,7 +59,11 @@ module.exports = async (req, res) => {
       // 简单测试邮件
       const msg = {
         to: userEmail,
-        from: 'info@aicocreatelife.com',
+        from: {
+  email: 'jwang1127@gmail.com',
+  name: 'AI Co-create Life'
+},
+replyTo: 'info@aicocreatelife.com',
         subject: '测试 - 您的AI共创人生报告正在生成',
         text: `${userName}，您好！我们收到了您的订单（${session.id}）。详细报告将在5分钟内发送到此邮箱。`,
         html: `<div style="font-family: Arial, sans-serif; padding: 20px;">

@@ -1,7 +1,7 @@
 ﻿const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
-const { createCanvas } = require('canvas');
+// ❌ 已删除 canvas 导入 - 不再需要
 const { 
   CONTENT_LIBRARY, 
   DERIVED_INDICES,
@@ -12,7 +12,7 @@ const {
 const { generateCareerRecommendations, generate30DayPlan, generateResources } = require('./reportHelpers');
 
 /**
- * 生成完整专业版 Big Five 人格报告
+ * 生成完整专业版 Big Five 人格报告（无雷达图版本 - Vercel 兼容）
  */
 async function generatePersonalityReport(userData = {}, outputPath = './personality-report.pdf') {
   return new Promise(async (resolve, reject) => {
@@ -82,81 +82,80 @@ async function generatePersonalityReport(userData = {}, outputPath = './personal
       }
 
       // 5. 衍生指数分析函数
-      // ============ 衍生指数分析函数（使用双语 contentLibrary） ============
-function addIndicesAnalysis() {
-  doc.font('ChineseBold').fontSize(18).fillColor(colors.primary)
-     .text('综合指数分析 / Comprehensive Indices Analysis', 50);
-  doc.moveDown(0.5);
-  doc.font('Chinese').fontSize(11).fillColor(colors.lightText)
-     .text('以下衍生指数为您的人格特质提供额外洞察：\nThese derived indices provide additional insights into your personality profile:', 50, doc.y, { lineGap: 4 });
-  doc.moveDown(2);
-  
-  const indices = [
-    { key: 'human_value', score: derivedIndices.human_value },
-    { key: 'life_integration', score: derivedIndices.life_integration },
-    { key: 'entrepreneurship', score: derivedIndices.entrepreneurship }
-  ];
-  
-  indices.forEach((idx, i) => {
-    const indexData = DERIVED_INDICES[idx.key];
-    const interp = getIndexInterpretation(idx.key, idx.score);
-    
-    // 每个指数换页（第一个除外）
-    if (i > 0) {
-      addNewPage();
-      doc.font('ChineseBold').fontSize(16).fillColor(colors.primary)
-         .text('综合指数分析（续）/ Comprehensive Indices Analysis (cont.)', 50);
-      doc.moveDown(2);
-    }
-    
-    // 指数名称（双语）
-    doc.font('ChineseBold').fontSize(16).fillColor(colors.primary)
-       .text(`${indexData.icon} ${indexData.nameZh}`, 50);
-    doc.font('ChineseBold').fontSize(12).fillColor(colors.lightText)
-       .text(indexData.name, 50);
-    doc.font('ChineseBold').fontSize(14).fillColor(colors.secondary)
-       .text(`得分 / Score: ${idx.score}/100`, 380);
-    doc.moveDown(1);
-    
-    // Category（双语）
-    doc.font('ChineseBold').fontSize(12).fillColor(colors.secondary)
-       .text(`类别 / Category: ${interp.titleZh} / ${interp.title}`, 50);
-    doc.moveDown(1.5);
-    
-    // 描述（双语）
-    doc.font('ChineseBold').fontSize(12).fillColor(colors.text)
-       .text('描述 / Description:', 50);
-    doc.moveDown(0.3);
-    doc.font('Chinese').fontSize(11).fillColor(colors.text)
-       .text(interp.descriptionZh, 50, doc.y, { width: 495, lineGap: 5 });
-    doc.moveDown(0.3);
-    doc.font('Chinese').fontSize(10).fillColor(colors.lightText)
-       .text(interp.description, 50, doc.y, { width: 495, lineGap: 4 });
-    doc.moveDown(1.5);
-    
-    // 优势（双语）
-    doc.font('ChineseBold').fontSize(12).fillColor(colors.green)
-       .text('优势 / Strengths:', 50);
-    doc.moveDown(0.3);
-    doc.font('Chinese').fontSize(11).fillColor(colors.text)
-       .text(interp.strengthsZh, 50, doc.y, { width: 495, lineGap: 4 });
-    doc.moveDown(0.3);
-    doc.font('Chinese').fontSize(10).fillColor(colors.lightText)
-       .text(interp.strengths, 50, doc.y, { width: 495, lineGap: 3 });
-    doc.moveDown(1.5);
-    
-    // 发展（双语）
-    doc.font('ChineseBold').fontSize(12).fillColor(colors.orange)
-       .text('发展方向 / Development:', 50);
-    doc.moveDown(0.3);
-    doc.font('Chinese').fontSize(11).fillColor(colors.text)
-       .text(interp.developmentZh, 50, doc.y, { width: 495, lineGap: 4 });
-    doc.moveDown(0.3);
-    doc.font('Chinese').fontSize(10).fillColor(colors.lightText)
-       .text(interp.development, 50, doc.y, { width: 495, lineGap: 3 });
-    doc.moveDown(3);
-  });
-}
+      function addIndicesAnalysis() {
+        doc.font('ChineseBold').fontSize(18).fillColor(colors.primary)
+           .text('综合指数分析 / Comprehensive Indices Analysis', 50);
+        doc.moveDown(0.5);
+        doc.font('Chinese').fontSize(11).fillColor(colors.lightText)
+           .text('以下衍生指数为您的人格特质提供额外洞察：\nThese derived indices provide additional insights into your personality profile:', 50, doc.y, { lineGap: 4 });
+        doc.moveDown(2);
+        
+        const indices = [
+          { key: 'human_value', score: derivedIndices.human_value },
+          { key: 'life_integration', score: derivedIndices.life_integration },
+          { key: 'entrepreneurship', score: derivedIndices.entrepreneurship }
+        ];
+        
+        indices.forEach((idx, i) => {
+          const indexData = DERIVED_INDICES[idx.key];
+          const interp = getIndexInterpretation(idx.key, idx.score);
+          
+          // 每个指数换页（第一个除外）
+          if (i > 0) {
+            addNewPage();
+            doc.font('ChineseBold').fontSize(16).fillColor(colors.primary)
+               .text('综合指数分析（续）/ Comprehensive Indices Analysis (cont.)', 50);
+            doc.moveDown(2);
+          }
+          
+          // 指数名称（双语）
+          doc.font('ChineseBold').fontSize(16).fillColor(colors.primary)
+             .text(`${indexData.icon} ${indexData.nameZh}`, 50);
+          doc.font('ChineseBold').fontSize(12).fillColor(colors.lightText)
+             .text(indexData.name, 50);
+          doc.font('ChineseBold').fontSize(14).fillColor(colors.secondary)
+             .text(`得分 / Score: ${idx.score}/100`, 380);
+          doc.moveDown(1);
+          
+          // Category（双语）
+          doc.font('ChineseBold').fontSize(12).fillColor(colors.secondary)
+             .text(`类别 / Category: ${interp.titleZh} / ${interp.title}`, 50);
+          doc.moveDown(1.5);
+          
+          // 描述（双语）
+          doc.font('ChineseBold').fontSize(12).fillColor(colors.text)
+             .text('描述 / Description:', 50);
+          doc.moveDown(0.3);
+          doc.font('Chinese').fontSize(11).fillColor(colors.text)
+             .text(interp.descriptionZh, 50, doc.y, { width: 495, lineGap: 5 });
+          doc.moveDown(0.3);
+          doc.font('Chinese').fontSize(10).fillColor(colors.lightText)
+             .text(interp.description, 50, doc.y, { width: 495, lineGap: 4 });
+          doc.moveDown(1.5);
+          
+          // 优势（双语）
+          doc.font('ChineseBold').fontSize(12).fillColor(colors.green)
+             .text('优势 / Strengths:', 50);
+          doc.moveDown(0.3);
+          doc.font('Chinese').fontSize(11).fillColor(colors.text)
+             .text(interp.strengthsZh, 50, doc.y, { width: 495, lineGap: 4 });
+          doc.moveDown(0.3);
+          doc.font('Chinese').fontSize(10).fillColor(colors.lightText)
+             .text(interp.strengths, 50, doc.y, { width: 495, lineGap: 3 });
+          doc.moveDown(1.5);
+          
+          // 发展（双语）
+          doc.font('ChineseBold').fontSize(12).fillColor(colors.orange)
+             .text('发展方向 / Development:', 50);
+          doc.moveDown(0.3);
+          doc.font('Chinese').fontSize(11).fillColor(colors.text)
+             .text(interp.developmentZh, 50, doc.y, { width: 495, lineGap: 4 });
+          doc.moveDown(0.3);
+          doc.font('Chinese').fontSize(10).fillColor(colors.lightText)
+             .text(interp.development, 50, doc.y, { width: 495, lineGap: 3 });
+          doc.moveDown(3);
+        });
+      }
 
       // ============ 开始生成报告 ============
       doc.pipe(fs.createWriteStream(outputPath));
@@ -207,15 +206,15 @@ function addIndicesAnalysis() {
       const toc = [
         { titleZh: 'I. 您的人格概览', titleEn: 'I. Your Personality Overview', page: 3 },
         { titleZh: 'II. OCEAN 五维度分析', titleEn: 'II. OCEAN Five Dimensions Analysis', page: 4 },
-        { titleZh: '    1. 开放性维度', titleEn: '    1. Openness Dimension', page: 6 },
-        { titleZh: '    2. 尽责性维度', titleEn: '    2. Conscientiousness Dimension', page: 7 },
-        { titleZh: '    3. 外向性维度', titleEn: '    3. Extraversion Dimension', page: 8 },
-        { titleZh: '    4. 宜人性维度', titleEn: '    4. Agreeableness Dimension', page: 9 },
-        { titleZh: '    5. 情绪稳定性维度', titleEn: '    5. Emotional Stability Dimension', page: 10 },
-        { titleZh: 'III. 职业推荐', titleEn: 'III. Career Recommendations', page: 11 },
-        { titleZh: 'IV. 综合指数分析', titleEn: 'IV. Comprehensive Indices Analysis', page: 12 },
-        { titleZh: 'V. 30天发展计划', titleEn: 'V. 30-Day Development Plan', page: 15 },
-        { titleZh: 'VI. 资源和下一步', titleEn: 'VI. Resources & Next Steps', page: 18 }
+        { titleZh: '    1. 开放性维度', titleEn: '    1. Openness Dimension', page: 5 },
+        { titleZh: '    2. 尽责性维度', titleEn: '    2. Conscientiousness Dimension', page: 6 },
+        { titleZh: '    3. 外向性维度', titleEn: '    3. Extraversion Dimension', page: 7 },
+        { titleZh: '    4. 宜人性维度', titleEn: '    4. Agreeableness Dimension', page: 8 },
+        { titleZh: '    5. 情绪稳定性维度', titleEn: '    5. Emotional Stability Dimension', page: 9 },
+        { titleZh: 'III. 职业推荐', titleEn: 'III. Career Recommendations', page: 10 },
+        { titleZh: 'IV. 综合指数分析', titleEn: 'IV. Comprehensive Indices Analysis', page: 11 },
+        { titleZh: 'V. 30天发展计划', titleEn: 'V. 30-Day Development Plan', page: 14 },
+        { titleZh: 'VI. 资源和下一步', titleEn: 'VI. Resources & Next Steps', page: 17 }
       ];
 
       toc.forEach(item => {
@@ -318,101 +317,7 @@ function addIndicesAnalysis() {
         doc.moveDown(4);
       });
 
-      // ============ 雷达图页面 ============
-      newPage();
-      addSectionHeader('五大人格雷达图 / OCEAN Radar Chart');
-
-      // 检查是否有足够空间放置图表（需要约400px）
-      newPageIfNeeded(400);
-
-      const radarCanvas = createCanvas(500, 500);
-      const ctx = radarCanvas.getContext('2d');
-      const center = 250;
-      const radius = 150;
-      const angleStep = (2 * Math.PI) / 5;
-
-      ctx.strokeStyle = '#E5E7EB';
-      ctx.lineWidth = 1.5;
-      for (let r = 50; r <= radius; r += 50) {
-        ctx.beginPath();
-        for (let i = 0; i <= 5; i++) {
-          const angle = i * angleStep - Math.PI / 2;
-          const x = center + r * Math.cos(angle);
-          const y = center + r * Math.sin(angle);
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-      }
-
-      ctx.strokeStyle = '#D1D5DB';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 5; i++) {
-        const angle = i * angleStep - Math.PI / 2;
-        const x = center + radius * Math.cos(angle);
-        const y = center + radius * Math.sin(angle);
-        ctx.beginPath();
-        ctx.moveTo(center, center);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-      }
-
-      ctx.font = 'bold 13px Arial';
-      ctx.fillStyle = '#1F2937';
-
-      const labels = ['Openness', 'Conscien-\ntiousness', 'Extraversion', 'Agreeable-\nness', 'Neuroticism'];
-
-      labels.forEach((label, i) => {
-        const angle = i * angleStep - Math.PI / 2;
-        let distance = radius + 40;
-        
-        if (i === 4) {
-          distance = radius + 30;
-        }
-        
-        const x = center + distance * Math.cos(angle);
-        const y = center + distance * Math.sin(angle);
-        
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        if (i === 0) ctx.textBaseline = 'bottom';
-        else if (i === 1) { ctx.textAlign = 'left'; ctx.textBaseline = 'top'; }
-        else if (i === 2) { ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; }
-        else if (i === 3) { ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; }
-        else if (i === 4) { ctx.textAlign = 'right'; ctx.textBaseline = 'top'; }
-        
-        ctx.fillText(label, x, y);
-      });
-
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(59,130,246,0.3)';
-      ctx.strokeStyle = '#3B82F6';
-      ctx.lineWidth = 3;
-      scores.forEach((score, i) => {
-        const angle = i * angleStep - Math.PI / 2;
-        const x = center + (radius * (score / 100)) * Math.cos(angle);
-        const y = center + (radius * (score / 100)) * Math.sin(angle);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = '#3B82F6';
-      scores.forEach((score, i) => {
-        const angle = i * angleStep - Math.PI / 2;
-        const x = center + (radius * (score / 100)) * Math.cos(angle);
-        const y = center + (radius * (score / 100)) * Math.sin(angle);
-        ctx.beginPath();
-        ctx.arc(x, y, 6, 0, 2 * Math.PI);
-        ctx.fill();
-      });
-
-      const radarImg = radarCanvas.toBuffer();
-      doc.image(radarImg, { width: 380, align: 'center', x: (doc.page.width - 380) / 2 });
-      doc.moveDown(1);
+      // ❌ 雷达图部分已删除 - 不兼容 Vercel 环境
 
       // ============ 详细维度分析 ============
       traits.forEach((trait) => {
@@ -594,7 +499,7 @@ function addIndicesAnalysis() {
       addSectionHeader('资源和下一步 / Resources & Next Steps',
                        '继续您的发展旅程，以下资源可以帮助您：\nContinue your development journey with these resources:');
 
-      const resources = generateResources(); // ← 传入分数
+      const resources = generateResources();
 
       doc.font('ChineseBold').fontSize(13).fillColor(colors.text)
         .text('📚 书籍推荐 / Recommended Books');
@@ -650,7 +555,7 @@ function addIndicesAnalysis() {
 
       doc.end();
 
-      console.log(`✅ 已生成完整专业报告: ${outputPath}`);
+      console.log(`✅ 已生成完整专业报告（无雷达图版本）: ${outputPath}`);
       resolve(outputPath);
       
     } catch (error) {

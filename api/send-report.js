@@ -44,10 +44,27 @@ module.exports = async (req, res) => {
     const pdfPath = path.join(tmpDir, `report-${Date.now()}.pdf`);
     
     try {
+      console.log('🔧 调用 generatePersonalityReport...');
+      console.log('📁 PDF 输出路径:', pdfPath);
       await generatePersonalityReport(userData, pdfPath);
       console.log('✅ PDF 生成成功:', pdfPath);
+      
+      // 验证文件是否真的存在
+      if (!fs.existsSync(pdfPath)) {
+        throw new Error('PDF 文件生成后不存在！');
+      }
+      
+      const fileSize = fs.statSync(pdfPath).size;
+      console.log('📊 PDF 文件大小:', fileSize, 'bytes');
+      
+      if (fileSize === 0) {
+        throw new Error('PDF 文件大小为 0！');
+      }
+      
     } catch (pdfError) {
-      console.error('❌ PDF 生成失败:', pdfError);
+      console.error('❌ PDF 生成失败 - 完整错误:');
+      console.error('错误消息:', pdfError.message);
+      console.error('错误堆栈:', pdfError.stack);
       throw new Error('PDF 生成失败: ' + pdfError.message);
     }
 

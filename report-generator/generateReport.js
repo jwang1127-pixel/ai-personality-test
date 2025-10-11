@@ -164,20 +164,34 @@ async function generatePersonalityReport(userData = {}, outputPath = './personal
       const derivedIndices = calculateDerivedIndices(userData.scores);
 
       // ============ 字体设置 ============
+      console.log('🔍 当前工作目录:', process.cwd());
+      console.log('🔍 __dirname:', __dirname);
+      
       const regularFont = path.join(__dirname, '../fonts/NotoSansSC-Regular.ttf');
       const boldFont = path.join(__dirname, '../fonts/NotoSansSC-Bold.ttf');
+      
+      console.log('📁 字体路径 Regular:', regularFont);
+      console.log('📁 字体路径 Bold:', boldFont);
+      console.log('📁 Regular 文件存在?', fs.existsSync(regularFont));
+      console.log('📁 Bold 文件存在?', fs.existsSync(boldFont));
 
+      let useChineseFont = false;
+      
       try {
         if (fs.existsSync(regularFont) && fs.existsSync(boldFont)) {
           doc.registerFont('Chinese', regularFont);
           doc.registerFont('ChineseBold', boldFont);
+          doc.font('Chinese');
+          useChineseFont = true;
           console.log('✅ 已加载中文字体');
         } else {
-          console.warn('⚠️ 未找到中文字体');
+          console.warn('⚠️ 未找到中文字体，使用 Helvetica');
           doc.font('Helvetica');
         }
       } catch (err) {
-        console.error('字体加载错误：', err);
+        console.error('❌ 字体加载错误：', err);
+        console.error('使用默认字体 Helvetica');
+        doc.font('Helvetica');
       }
 
       // ============ 封面 ============

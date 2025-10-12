@@ -58,21 +58,35 @@ export default async (req, res) => {
 
     // 调用新的 send-report API
     try {
-      console.log('🔄 调用 send-report API...');
-      
-      const sendReportUrl = process.env.VERCEL_URL 
-        ? `https://${process.env.VERCEL_URL}/api/send-report`
-        : 'https://www.aicocreatelife.com/api/send-report';
+      console.log('🔄 准备调用 send-report...');
+      console.log('📧 邮箱:', reportData.email);
+      console.log('👤 姓名:', reportData.name);
+      console.log('📊 分数:', reportData.scores);
 
-      console.log('🌐 API URL:', sendReportUrl);
+      // 使用固定的生产 URL（更可靠）
+      const sendReportUrl = 'https://www.aicocreatelife.com/api/send-report';
+      
+      console.log('🌐 调用 URL:', sendReportUrl);
 
       const response = await fetch(sendReportUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'User-Agent': 'Stripe-Webhook-Internal'
         },
         body: JSON.stringify(reportData)
       });
+
+      console.log('📡 响应状态码:', response.status);
+      console.log('📡 响应 Content-Type:', response.headers.get('content-type'));
+
+      // 检查响应类型
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('❌ 返回的不是 JSON，而是:', text.substring(0, 200));
+        throw new Error('send-report 返回了 HTML 而不是 JSON，可能路由有问题');
+      }
 
       const result = await response.json();
 
@@ -86,6 +100,7 @@ export default async (req, res) => {
     } catch (error) {
       console.error('❌ 调用 send-report 失败:', error);
       console.error('错误详情:', error.message);
+      console.error('错误堆栈:', error.stack);
     }
   }
 

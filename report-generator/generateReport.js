@@ -13,6 +13,8 @@ const { generateCareerRecommendations, generate30DayPlan, generateResources } = 
 
 /**
  * 生成完整专业版 Big Five 人格报告（无雷达图版本 - Vercel 兼容）
+ * @param {Object} userData - 用户数据
+ * @param {String|null} outputPath - 输出路径，如果为 null 则返回 Buffer
  */
 async function generatePersonalityReport(userData = {}, outputPath = './personality-report.pdf') {
   return new Promise(async (resolve, reject) => {
@@ -23,6 +25,45 @@ async function generatePersonalityReport(userData = {}, outputPath = './personal
         bufferPages: true,
         autoFirstPage: false
       });
+
+      // ============ 如果 outputPath 为 null，使用 Buffer 模式 ============
+      const useBuffer = (outputPath === null);
+      let buffers = [];
+      
+      if (useBuffer) {
+        console.log('📦 使用 Buffer 模式生成 PDF');
+        doc.on('data', buffers.push.bind(buffers));
+        doc.on('end', () => {
+          const pdfBuffer = Buffer.concat(buffers);
+          console.log('✅ PDF Buffer 生成完成，大小:', pdfBuffer.length, 'bytes');
+          resolve(pdfBuffer);
+        });
+        doc.on('error', (err) => {
+          console.error('❌ PDF Buffer 生成错误:', err);
+          reject(err);
+        });
+      } else {
+        console.log('📁 使用文件模式生成 PDF:', outputPath);
+        doc.pipe(fs.createWriteStream(outputPath));
+        doc.on('finish', () => {
+          console.log(`✅ PDF 写入完成: ${outputPath}`);
+          if (fs.existsSync(outputPath)) {
+            const fileSize = fs.statSync(outputPath).size;
+            console.log(`📊 PDF 文件大小: ${fileSize} bytes`);
+            if (fileSize > 0) {
+              resolve(outputPath);
+            } else {
+              reject(new Error('PDF 文件大小为 0'));
+            }
+          } else {
+            reject(new Error('PDF 写入完成，但文件不存在'));
+          }
+        });
+        doc.on('error', (err) => {
+          console.error('❌ PDF 写入错误:', err);
+          reject(err);
+        });
+      }
 
       // ============ 颜色配置（提前定义，供所有函数使用） ============
       const colors = {
@@ -158,7 +199,7 @@ async function generatePersonalityReport(userData = {}, outputPath = './personal
       }
 
       // ============ 开始生成报告 ============
-      doc.pipe(fs.createWriteStream(outputPath));
+      // 不再需要 doc.pipe()，已在前面根据模式处理
       
       // 计算衍生指数
       const derivedIndices = calculateDerivedIndices(userData.scores);
@@ -567,10 +608,33 @@ async function generatePersonalityReport(userData = {}, outputPath = './personal
       
       console.log(`✅ 页码添加完成`);
 
+      // ============ 结束文档并等待写入完成 ============
       doc.end();
-
-      console.log(`✅ 已生成完整专业报告（无雷达图版本）: ${outputPath}`);
-      resolve(outputPath);
+      
+      // 等待流完成写入
+      doc.on('finish', () => {
+        console.log(`✅ PDF 写入完成: ${outputPath}`);
+        
+        // 验证文件确实存在
+        if (fs.existsSync(outputPath)) {
+          const fileSize = fs.statSync(outputPath).size;
+          console.log(`📊 PDF 文件大小: ${fileSize} bytes`);
+          
+          if (fileSize > 0) {
+            console.log(`✅ 已生成完整专业报告（无雷达图版本）: ${outputPath}`);
+            resolve(outputPath);
+          } else {
+            reject(new Error('PDF 文件大小为 0'));
+          }
+        } else {
+          reject(new Error('PDF 写入完成，但文件不存在'));
+        }
+      });
+      
+      doc.on('error', (err) => {
+        console.error('❌ PDF 写入错误:', err);
+        reject(err);
+      });
       
     } catch (error) {
       console.error('❌ 生成报告失败:', error);

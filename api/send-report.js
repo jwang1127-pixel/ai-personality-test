@@ -1,6 +1,4 @@
 const https = require('https');
-const fs = require('fs');
-const path = require('path');
 const { generatePersonalityReport } = require('../report-generator/generateReport');
 
 module.exports = async (req, res) => {
@@ -29,7 +27,7 @@ module.exports = async (req, res) => {
       throw new Error('SENDGRID_API_KEY 未配置');
     }
 
-    // ============ 1. 生成 PDF 报告 ============
+    // ============ 1. 生成 PDF 报告（直接生成 Buffer）============
     console.log('📄 开始生成 PDF 报告...');
     
     const userData = {
@@ -39,26 +37,16 @@ module.exports = async (req, res) => {
       date: new Date().toLocaleDateString('zh-CN')
     };
 
-    // 使用临时文件路径
-    const tmpDir = '/tmp';
-    const pdfPath = path.join(tmpDir, `report-${Date.now()}.pdf`);
+    let pdfBuffer;
     
     try {
-      console.log('🔧 调用 generatePersonalityReport...');
-      console.log('📁 PDF 输出路径:', pdfPath);
-      await generatePersonalityReport(userData, pdfPath);
-      console.log('✅ PDF 生成成功:', pdfPath);
+      console.log('🔧 调用 generatePersonalityReport（Buffer模式）...');
+      pdfBuffer = await generatePersonalityReport(userData, null); // null = 返回 Buffer
+      console.log('✅ PDF 生成成功');
+      console.log('📊 PDF 大小:', pdfBuffer.length, 'bytes');
       
-      // 验证文件是否真的存在
-      if (!fs.existsSync(pdfPath)) {
-        throw new Error('PDF 文件生成后不存在！');
-      }
-      
-      const fileSize = fs.statSync(pdfPath).size;
-      console.log('📊 PDF 文件大小:', fileSize, 'bytes');
-      
-      if (fileSize === 0) {
-        throw new Error('PDF 文件大小为 0！');
+      if (pdfBuffer.length === 0) {
+        throw new Error('PDF Buffer 大小为 0！');
       }
       
     } catch (pdfError) {
@@ -68,9 +56,8 @@ module.exports = async (req, res) => {
       throw new Error('PDF 生成失败: ' + pdfError.message);
     }
 
-    // ============ 2. 读取 PDF 并转换为 Base64 ============
-    console.log('📦 读取 PDF 文件...');
-    const pdfBuffer = fs.readFileSync(pdfPath);
+    // ============ 2. 转换为 Base64 ============
+    console.log('📦 转换 PDF 为 Base64...');
     const pdfBase64 = pdfBuffer.toString('base64');
     console.log('✅ PDF 转换为 Base64 成功');
 
@@ -117,14 +104,6 @@ module.exports = async (req, res) => {
         let body = '';
         response.on('data', (chunk) => body += chunk);
         response.on('end', () => {
-          // ============ 5. 清理临时文件 ============
-          try {
-            fs.unlinkSync(pdfPath);
-            console.log('🗑️  临时 PDF 已删除');
-          } catch (cleanupError) {
-            console.warn('⚠️  清理临时文件失败:', cleanupError);
-          }
-
           if (response.statusCode === 202) {
             console.log('✅ 邮件发送成功！');
             res.status(200).json({
@@ -144,12 +123,6 @@ module.exports = async (req, res) => {
 
       request.on('error', (error) => {
         console.error('❌ 请求失败:', error);
-        
-        // 清理临时文件
-        try {
-          fs.unlinkSync(pdfPath);
-        } catch (e) {}
-        
         res.status(500).json({
           success: false,
           error: error.message

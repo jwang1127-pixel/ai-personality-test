@@ -49,10 +49,21 @@ export default async (req, res) => {
     console.log('📧 客户邮箱:', session.customer_email);
     console.log('📦 Session Metadata:', session.metadata);
 
+    // 从分散的 metadata 字段构建 scores 对象
+    const scores = {
+      openness: parseInt(session.metadata?.openness || '50'),
+      conscientiousness: parseInt(session.metadata?.conscientiousness || '50'),
+      extraversion: parseInt(session.metadata?.extraversion || '50'),
+      agreeableness: parseInt(session.metadata?.agreeableness || '50'),
+      neuroticism: parseInt(session.metadata?.neuroticism || '50')
+    };
+
+    console.log('📊 构建的分数对象:', scores);
+
     reportData = {
-      email: session.customer_email,
-      name: session.metadata?.user_name || session.customer_details?.name || 'User',
-      scores: JSON.parse(session.metadata?.test_scores || '{}')
+      email: session.customer_email || session.metadata?.email,
+      name: session.metadata?.name || session.customer_details?.name || 'User',
+      scores: scores
     };
   } 
   // 处理 payment_intent.succeeded 事件（当前系统使用的）
@@ -63,19 +74,25 @@ export default async (req, res) => {
     console.log('📧 Receipt Email:', paymentIntent.receipt_email);
     console.log('📦 Payment Intent Metadata:', paymentIntent.metadata);
 
+    // 从分散的 metadata 字段构建 scores 对象
+    const scores = {
+      openness: parseInt(paymentIntent.metadata?.openness || '50'),
+      conscientiousness: parseInt(paymentIntent.metadata?.conscientiousness || '50'),
+      extraversion: parseInt(paymentIntent.metadata?.extraversion || '50'),
+      agreeableness: parseInt(paymentIntent.metadata?.agreeableness || '50'),
+      neuroticism: parseInt(paymentIntent.metadata?.neuroticism || '50')
+    };
+
+    console.log('📊 构建的分数对象:', scores);
+
     reportData = {
       email: paymentIntent.receipt_email || paymentIntent.metadata?.email,
-      name: paymentIntent.metadata?.user_name || 'User',
-      scores: JSON.parse(paymentIntent.metadata?.test_scores || '{}')
+      name: paymentIntent.metadata?.name || 'User',
+      scores: scores
     };
 
     if (!reportData.email) {
       console.error('❌ payment_intent 中没有邮箱地址！');
-    }
-
-    if (Object.keys(reportData.scores).length === 0) {
-      console.error('⚠️ payment_intent 中没有分数数据！');
-      console.log('💡 需要在创建 PaymentIntent 时添加 metadata');
     }
   }
 

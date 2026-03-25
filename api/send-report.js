@@ -20,11 +20,11 @@ module.exports = async (req, res) => {
     console.log('📧 开始处理报告发送请求...');
     console.log('📊 用户数据:', { email, name, scores });
     
-    const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+    const RESEND_API_KEY = process.env.RESEND_API_KEY;
     const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@aicocreatelife.com';
 
-    if (!SENDGRID_API_KEY) {
-      throw new Error('SENDGRID_API_KEY 未配置');
+    if (!RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY 未配置');
     }
 
     // ============ 1. 生成 PDF 报告（直接生成 Buffer）============
@@ -41,7 +41,7 @@ module.exports = async (req, res) => {
     
     try {
       console.log('🔧 调用 generatePersonalityReport（Buffer模式）...');
-      pdfBuffer = await generatePersonalityReport(userData, null); // null = 返回 Buffer
+      pdfBuffer = await generatePersonalityReport(userData, null);
       console.log('✅ PDF 生成成功');
       console.log('📊 PDF 大小:', pdfBuffer.length, 'bytes');
       
@@ -64,36 +64,26 @@ module.exports = async (req, res) => {
     // ============ 3. 生成邮件 HTML ============
     const emailHtml = generateEmailHtml(name, scores);
 
-    // ============ 4. 通过 SendGrid 发送邮件（带 PDF 附件）============
-    console.log('📨 准备发送邮件...');
+    // ============ 4. 通过 Resend 发送邮件（带 PDF 附件）============
+    console.log('📨 准备通过 Resend 发送邮件...');
     
     const emailData = JSON.stringify({
-      personalizations: [{
-        to: [{ email: email }],
-        subject: `${name}，您的 AI 共创人生 18 页专业分析报告`
-      }],
-      from: { 
-        email: FROM_EMAIL, 
-        name: 'AI共创人生团队' 
-      },
-      content: [{
-        type: 'text/html',
-        value: emailHtml
-      }],
+      from: `AI共创人生团队 <${FROM_EMAIL}>`,
+      to: [email],
+      subject: `${name}，您的 AI 共创人生 18 页专业分析报告`,
+      html: emailHtml,
       attachments: [{
-        content: pdfBase64,
         filename: `${name}_人格分析报告.pdf`,
-        type: 'application/pdf',
-        disposition: 'attachment'
+        content: pdfBase64
       }]
     });
 
     const options = {
-      hostname: 'api.sendgrid.com',
-      path: '/v3/mail/send',
+      hostname: 'api.resend.com',
+      path: '/emails',
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${SENDGRID_API_KEY}`,
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(emailData)
       }
@@ -104,14 +94,14 @@ module.exports = async (req, res) => {
         let body = '';
         response.on('data', (chunk) => body += chunk);
         response.on('end', () => {
-          if (response.statusCode === 202) {
+          if (response.statusCode === 200 || response.statusCode === 201) {
             console.log('✅ 邮件发送成功！');
             res.status(200).json({
               success: true,
               message: '18页专业报告已发送到您的邮箱，请查收附件！'
             });
           } else {
-            console.error('❌ SendGrid 错误:', body);
+            console.error('❌ Resend 错误:', body);
             res.status(response.statusCode).json({
               success: false,
               error: body

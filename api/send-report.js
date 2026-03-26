@@ -150,7 +150,7 @@ async function saveToAirtable({ email, name, scores }) {
 
   const fields = {
     name: name || '',
-    email: email || '',
+    Email: email || '',
     test_date: new Date().toISOString().split('T')[0],
     extraversion: parseInt(scores?.extraversion || 50),
     openness: parseInt(scores?.openness || 50),

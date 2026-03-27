@@ -194,7 +194,7 @@ async function generateThreeForcesContent(userData, threeForces) {
 
   const https = require('https');
   const body = JSON.stringify({
-    model: 'claude-opus-4-5',
+    model: 'claude-opus-4-6',
     max_tokens: 1500,
     system: systemPrompt,
     messages: [{ role: 'user', content: userPrompt }],
@@ -220,11 +220,13 @@ async function generateThreeForcesContent(userData, threeForces) {
         try {
           const parsed = JSON.parse(data);
           if (parsed.error) {
+            console.error('❌ Claude API 返回错误:', JSON.stringify(parsed.error));
             reject(new Error(`Claude API错误: ${parsed.error.message}`));
           } else {
             resolve(parsed.content[0].text);
           }
         } catch (e) {
+          console.error('❌ Claude API 响应原始内容:', data.substring(0, 300));
           reject(new Error('Claude API响应解析失败: ' + e.message));
         }
       });

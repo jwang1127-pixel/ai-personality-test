@@ -215,6 +215,7 @@ async function generatePersonalityReport(userData = {}, outputPath = './personal
         console.log('✅ 三力内容生成成功');
       } catch (tfErr) {
         console.error('⚠️ 三力内容生成失败，将跳过该章节:', tfErr.message);
+        console.error('⚠️ 三力错误堆栈:', tfErr.stack);
       }
 
       // ============ 字体设置 ============

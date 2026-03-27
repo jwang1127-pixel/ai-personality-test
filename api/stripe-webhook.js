@@ -41,7 +41,7 @@ export default async (req, res) => {
 
   let reportData = null;
 
-  // 处理 checkout.session.completed 事件（推荐方式）
+  // 处理 checkout.session.completed 事件
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     
@@ -69,39 +69,10 @@ export default async (req, res) => {
       name: session.metadata?.name || session.customer_details?.name || 'User',
       scores: scores
     };
-  } 
-  // 处理 payment_intent.succeeded 事件（当前系统使用的）
-  else if (event.type === 'payment_intent.succeeded') {
-    const paymentIntent = event.data.object;
-    
-    console.log('💳 收到 Payment Intent 成功事件');
-    console.log('📧 Receipt Email:', paymentIntent.receipt_email);
-    console.log('📦 Payment Intent Metadata:', paymentIntent.metadata);
-
-    // 从分散的 metadata 字段构建 scores 对象（全9维度）
-    const scores = {
-      openness:          parseInt(paymentIntent.metadata?.openness          || '50'),
-      conscientiousness: parseInt(paymentIntent.metadata?.conscientiousness || '50'),
-      extraversion:      parseInt(paymentIntent.metadata?.extraversion      || '50'),
-      agreeableness:     parseInt(paymentIntent.metadata?.agreeableness     || '50'),
-      neuroticism:       parseInt(paymentIntent.metadata?.neuroticism       || '50'),
-      ai_adaptability:   parseInt(paymentIntent.metadata?.ai_adaptability   || '50'),
-      human_value:       parseInt(paymentIntent.metadata?.human_value       || '50'),
-      life_integration:  parseInt(paymentIntent.metadata?.life_integration  || '50'),
-      entrepreneurship:  parseInt(paymentIntent.metadata?.entrepreneurship  || '50'),
-    };
-
-    console.log('📊 构建的分数对象:', scores);
-
-    reportData = {
-      email: paymentIntent.receipt_email || paymentIntent.metadata?.email,
-      name: paymentIntent.metadata?.name || 'User',
-      scores: scores
-    };
-
-    if (!reportData.email) {
-      console.error('❌ payment_intent 中没有邮箱地址！');
-    }
+  } else {
+    // 其他事件类型一律忽略，直接返回200给Stripe
+    console.log('⏭️ 忽略事件类型:', event.type);
+    return res.status(200).json({ received: true });
   }
 
   // 如果有报告数据，发送报告

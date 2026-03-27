@@ -49,13 +49,17 @@ export default async (req, res) => {
     console.log('📧 客户邮箱:', session.customer_email);
     console.log('📦 Session Metadata:', session.metadata);
 
-    // 从分散的 metadata 字段构建 scores 对象
+    // 从分散的 metadata 字段构建 scores 对象（全9维度）
     const scores = {
-      openness: parseInt(session.metadata?.openness || '50'),
+      openness:          parseInt(session.metadata?.openness          || '50'),
       conscientiousness: parseInt(session.metadata?.conscientiousness || '50'),
-      extraversion: parseInt(session.metadata?.extraversion || '50'),
-      agreeableness: parseInt(session.metadata?.agreeableness || '50'),
-      neuroticism: parseInt(session.metadata?.neuroticism || '50')
+      extraversion:      parseInt(session.metadata?.extraversion      || '50'),
+      agreeableness:     parseInt(session.metadata?.agreeableness     || '50'),
+      neuroticism:       parseInt(session.metadata?.neuroticism       || '50'),
+      ai_adaptability:   parseInt(session.metadata?.ai_adaptability   || '50'),
+      human_value:       parseInt(session.metadata?.human_value       || '50'),
+      life_integration:  parseInt(session.metadata?.life_integration  || '50'),
+      entrepreneurship:  parseInt(session.metadata?.entrepreneurship  || '50'),
     };
 
     console.log('📊 构建的分数对象:', scores);
@@ -74,13 +78,17 @@ export default async (req, res) => {
     console.log('📧 Receipt Email:', paymentIntent.receipt_email);
     console.log('📦 Payment Intent Metadata:', paymentIntent.metadata);
 
-    // 从分散的 metadata 字段构建 scores 对象
+    // 从分散的 metadata 字段构建 scores 对象（全9维度）
     const scores = {
-      openness: parseInt(paymentIntent.metadata?.openness || '50'),
+      openness:          parseInt(paymentIntent.metadata?.openness          || '50'),
       conscientiousness: parseInt(paymentIntent.metadata?.conscientiousness || '50'),
-      extraversion: parseInt(paymentIntent.metadata?.extraversion || '50'),
-      agreeableness: parseInt(paymentIntent.metadata?.agreeableness || '50'),
-      neuroticism: parseInt(paymentIntent.metadata?.neuroticism || '50')
+      extraversion:      parseInt(paymentIntent.metadata?.extraversion      || '50'),
+      agreeableness:     parseInt(paymentIntent.metadata?.agreeableness     || '50'),
+      neuroticism:       parseInt(paymentIntent.metadata?.neuroticism       || '50'),
+      ai_adaptability:   parseInt(paymentIntent.metadata?.ai_adaptability   || '50'),
+      human_value:       parseInt(paymentIntent.metadata?.human_value       || '50'),
+      life_integration:  parseInt(paymentIntent.metadata?.life_integration  || '50'),
+      entrepreneurship:  parseInt(paymentIntent.metadata?.entrepreneurship  || '50'),
     };
 
     console.log('📊 构建的分数对象:', scores);

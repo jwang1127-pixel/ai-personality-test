@@ -271,6 +271,65 @@
                 font-size: 1.5em;
             }
         }
+        /* 三力预览卡 */
+        .three-forces-card {
+            background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+            border-radius: 16px;
+            padding: 28px 24px;
+            margin: 20px 0;
+            color: white;
+        }
+        .three-forces-card h3 {
+            font-size: 1.1em;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+        .three-forces-card .subtitle {
+            font-size: 0.85em;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        .type-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 20px;
+            padding: 4px 16px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .force-row {
+            margin-bottom: 14px;
+        }
+        .force-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88em;
+            margin-bottom: 5px;
+            opacity: 0.95;
+        }
+        .force-bar-bg {
+            background: rgba(255,255,255,0.2);
+            border-radius: 6px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .force-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            background: white;
+            transition: width 1s ease;
+        }
+        .force-bar-fill.vision    { background: #93C5FD; }
+        .force-bar-fill.judgment  { background: #6EE7B7; }
+        .force-bar-fill.creativity{ background: #FCD34D; }
+        .forces-hint {
+            margin-top: 18px;
+            font-size: 0.82em;
+            opacity: 0.75;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -333,6 +392,41 @@
                 <p>• 确保邮箱地址正确，如有问题请立即联系客服</p>
             </div>
             
+            <!-- 三力画像预览 -->
+            <div class="three-forces-card" id="threeForcesCard" style="display:none">
+                <h3>🧠 你的 AI 时代能力画像</h3>
+                <p class="subtitle">完整分析已在报告中，这里是你的核心三力得分</p>
+                <div class="type-badge" id="thinkingTypeBadge">复合型</div>
+                <div class="force-row">
+                    <div class="force-label">
+                        <span>愿景力 Vision</span>
+                        <span id="vfScore">—</span>
+                    </div>
+                    <div class="force-bar-bg">
+                        <div class="force-bar-fill vision" id="vfBar" style="width:0%"></div>
+                    </div>
+                </div>
+                <div class="force-row">
+                    <div class="force-label">
+                        <span>判断力 Judgment</span>
+                        <span id="jfScore">—</span>
+                    </div>
+                    <div class="force-bar-bg">
+                        <div class="force-bar-fill judgment" id="jfBar" style="width:0%"></div>
+                    </div>
+                </div>
+                <div class="force-row">
+                    <div class="force-label">
+                        <span>创造力 Creativity</span>
+                        <span id="cfScore">—</span>
+                    </div>
+                    <div class="force-bar-bg">
+                        <div class="force-bar-fill creativity" id="cfBar" style="width:0%"></div>
+                    </div>
+                </div>
+                <p class="forces-hint">完整解读在您的邮件报告中 · 详细行动建议见 PDF</p>
+            </div>
+
             <!-- 分享邀请 -->
             <div class="share-section">
                 <h3>🎁 分享测试，获得9折优惠</h3>
@@ -376,11 +470,16 @@
         function getUrlParams() {
             const params = new URLSearchParams(window.location.search);
             return {
-                session_id: params.get('session_id'),
-                order_id: params.get('order_id'),
-                product: params.get('product'),
-                amount: params.get('amount'),
-                email: params.get('email')
+                session_id:   params.get('session_id'),
+                order_id:     params.get('order_id'),
+                product:      params.get('product'),
+                amount:       params.get('amount'),
+                email:        params.get('email'),
+                // 三力参数
+                vf: parseInt(params.get('vf') || '0'),
+                jf: parseInt(params.get('jf') || '0'),
+                cf: parseInt(params.get('cf') || '0'),
+                tt: params.get('tt') || '',
             };
         }
         
@@ -415,8 +514,40 @@
                 // 这里可以调用API确保邮件发送
                 console.log('订单确认，准备发送报告邮件');
             }
+
+            // 渲染三力预览卡
+            renderThreeForces(params);
         });
         
+        // 三力预览渲染
+        function renderThreeForces(params) {
+            if (!params.vf && !params.jf && !params.cf) return;
+
+            const typeNameMap = {
+                executorType: '⚙️ 执行型',
+                creatorType:  '✨ 创造型',
+                judgeType:    '⚖️ 判断型',
+                composite:    '🔄 复合型',
+            };
+
+            const card = document.getElementById('threeForcesCard');
+            card.style.display = 'block';
+
+            document.getElementById('thinkingTypeBadge').textContent =
+                typeNameMap[params.tt] || '复合型';
+
+            document.getElementById('vfScore').textContent = params.vf + ' 分';
+            document.getElementById('jfScore').textContent = params.jf + ' 分';
+            document.getElementById('cfScore').textContent = params.cf + ' 分';
+
+            // 延迟触发动画
+            setTimeout(() => {
+                document.getElementById('vfBar').style.width = params.vf + '%';
+                document.getElementById('jfBar').style.width = params.jf + '%';
+                document.getElementById('cfBar').style.width = params.cf + '%';
+            }, 300);
+        }
+
         // 分享到微信（显示二维码或提示）
         function shareToWechat() {
             alert('请截图保存本页面，然后在微信中分享。\n\n分享时提到优惠码：SHARE10 可获得9折优惠！');

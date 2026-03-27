@@ -10,6 +10,7 @@ const {
   getIndexInterpretation
 } = require('./contentLibrary');
 const { generateCareerRecommendations, generate30DayPlan, generateResources } = require('./reportHelpers');
+const { calculateThreeForces, generateThreeForcesContent, renderThreeForcesInPDF } = require('./threeForcesSection');
 
 /**
  * 生成完整专业版 Big Five 人格报告（无雷达图版本 - Vercel 兼容）
@@ -203,6 +204,18 @@ async function generatePersonalityReport(userData = {}, outputPath = './personal
       
       // 计算衍生指数
       const derivedIndices = calculateDerivedIndices(userData.scores);
+
+      // ============ 三力：提前计算 + 预生成 Claude 内容 ============
+      // 必须在 PDF 渲染前完成，否则内容无法嵌入
+      const threeForces = calculateThreeForces(userData.scores);
+      let threeForcesContent = null;
+      try {
+        console.log('🧠 开始生成三力画像内容...');
+        threeForcesContent = await generateThreeForcesContent(userData, threeForces);
+        console.log('✅ 三力内容生成成功');
+      } catch (tfErr) {
+        console.error('⚠️ 三力内容生成失败，将跳过该章节:', tfErr.message);
+      }
 
       // ============ 字体设置 ============
       console.log('🔍 当前工作目录:', process.cwd());
@@ -548,6 +561,12 @@ async function generatePersonalityReport(userData = {}, outputPath = './personal
       doc.font('Chinese').fontSize(9).fillColor(colors.text)
         .text('• 如遇困难，优先调整策略而非自我批评\n  When encountering difficulties, prioritize adjusting strategies over self-criticism', 
               70, tipBoxY + 82, { width: 450, lineGap: 2 });
+
+      // ============ AI时代能力画像：三力章节 ============
+      if (threeForcesContent) {
+        newPage();
+        renderThreeForcesInPDF(doc, colors, threeForces, threeForcesContent);
+      }
 
       // ============ 资源和下一步 ============
       newPage();

@@ -3,6 +3,10 @@
     "api/stripe-webhook.js": {
       "memory": 1024,
       "maxDuration": 10
+    },
+    "api/send-report.js": {
+      "memory": 1024,
+      "maxDuration": 60
     }
   },
   "routes": [

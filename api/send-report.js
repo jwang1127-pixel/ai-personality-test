@@ -1,5 +1,6 @@
 const https = require('https');
 const { generatePersonalityReport } = require('../report-generator/generateReport');
+const { calculateThreeForces } = require('../report-generator/threeForcesSection');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -65,7 +66,8 @@ module.exports = async (req, res) => {
     // ============ 4. 保存到 Airtable ============
     console.log('💾 保存数据到 Airtable...');
     try {
-      await saveToAirtable({ email, name, scores });
+      const threeForces = calculateThreeForces(scores);
+      await saveToAirtable({ email, name, scores, threeForces });
       console.log('✅ Airtable 保存成功');
     } catch (airtableError) {
       console.error('❌ Airtable 保存失败:', airtableError.message);
@@ -139,7 +141,7 @@ module.exports = async (req, res) => {
 };
 
 // ============ 保存到 Airtable ============
-async function saveToAirtable({ email, name, scores }) {
+async function saveToAirtable({ email, name, scores, threeForces }) {
   const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
   const AIRTABLE_BASE_ID = 'app0q1RjfN8jwIFCZ';
   const AIRTABLE_TABLE_ID = 'tblkGRx1pzrtlDB5l';
@@ -161,7 +163,12 @@ async function saveToAirtable({ email, name, scores }) {
     human_value: parseInt(scores?.human_value || 50),
     life_integration: parseInt(scores?.life_integration || 50),
     entrepreneurship: parseInt(scores?.entrepreneurship || 50),
-    purchase_intent: 'paid'
+    purchase_intent: 'paid',
+    // 三力画像
+    vision_force:     threeForces?.visionForce    || 0,
+    judgment_force:   threeForces?.judgmentForce  || 0,
+    creativity_force: threeForces?.creativityForce || 0,
+    thinking_type:    threeForces?.thinkingType   || '',
   };
 
   const airtableData = JSON.stringify({ fields });

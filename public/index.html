@@ -493,18 +493,36 @@
     <!-- 支付弹窗 -->
     <div class="payment-modal" id="paymentModal">
         <div class="payment-form">
-            <h3>📧 接收完整报告</h3>
-            <p style="text-align: center; color: #666; margin-bottom: 20px;">
-                报告将发送到您的邮箱
-            </p>
-            <input type="email" id="userEmail" placeholder="您的邮箱地址" required>
-            <input type="text" id="userName" placeholder="您的姓名" required>
-            <button class="pay-btn" onclick="processPayment()">支付 $19 并获取报告</button>
-            <div class="close-modal" onclick="closePaymentModal()">取消</div>
+<h3>🎉 你已完成第一测！</h3>
+<p style="text-align: center; color: #666; margin-bottom: 24px; line-height: 1.7;">
+    选择你的下一步：
+</p>
+<a href="https://forms.gle/edYauJpGgupLvvzp9" 
+   style="display:block; background:#2d5a3d; color:#fff; text-align:center; 
+          padding:14px 20px; border-radius:8px; text-decoration:none; 
+          font-weight:700; font-size:15px; margin-bottom:12px;">
+    继续做第二测：看清你的能力缺口 →
+</a>
+<div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+    <input type="text" id="userWechat" placeholder="留下微信号，免费领取完整报告" 
+           style="flex:1; padding:12px; border:1.5px solid #ddd; border-radius:8px; font-size:14px;">
+    <button onclick="submitWechat()" 
+            style="background:#1a1a1a; color:#fff; border:none; padding:12px 16px; 
+                   border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; white-space:nowrap;">
+        免费领取
+    </button>
+</div>
+<div class="close-modal" onclick="closePaymentModal()">稍后再说</div>
         </div>
     </div>
 
     <script>
+        function submitWechat() {
+    const wechat = document.getElementById('userWechat').value.trim();
+    if (!wechat) { alert('请输入微信号'); return; }
+    closePaymentModal();
+    alert('已收到！我们会尽快通过微信联系您，发送完整报告。微信号：' + wechat);
+}
         const questions = [
             {text: "在职业转型过程中，我更倾向于通过社交网络和人脉来寻找新机会", dimension: "extraversion", reverse: false},
             {text: "当面对AI等新技术时，我喜欢与他人讨论和分享学习心得", dimension: "extraversion", reverse: false},

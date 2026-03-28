@@ -470,21 +470,28 @@
                 
                 <!-- CTA区域 -->
                 <div class="cta-section">
-                    <h3>📊 想要完整的3000字专业报告？</h3>
-                    <ul>
-                        <li>✓ 每个维度的深度解析和具体案例</li>
-                        <li>✓ AI时代职业发展建议和路径规划</li>
-                        <li>✓ 30天行动计划和可执行步骤</li>
-                        <li>✓ 推荐资源和学习路径</li>
-                        <li>✓ 王博士专业点评</li>
-                        <li>✓ 永久保存，随时查阅</li>
-                    </ul>
-                    <div class="price">$19</div>
-                    <p style="font-size: 0.9em; opacity: 0.9;">Beta测试特价 | 原价 $49</p>
-                    <button class="unlock-btn" onclick="showPaymentModal()">获取完整报告</button>
-                    <p style="font-size: 0.9em; margin-top: 20px; opacity: 0.8;">
-                        🔒 支付安全由Stripe保护 | 💯 不满意全额退款
-                    </p>
+                   <h3>🎉 你已完成第一测！</h3>
+<p style="color:#666; margin-bottom:20px; line-height:1.7;">
+    选择你的下一步：
+</p>
+<a href="https://forms.gle/edYauJpGgupLvvzp9"
+   style="display:block; background:#2d5a3d; color:#fff; text-align:center;
+          padding:16px 20px; border-radius:8px; text-decoration:none;
+          font-weight:700; font-size:15px; margin-bottom:14px;">
+    继续做第二测：看清你的能力缺口 →
+</a>
+<div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+    <input type="text" id="userWechat2" placeholder="留下微信号，免费领取完整报告"
+           style="flex:1; padding:12px; border:1.5px solid #ddd; border-radius:8px; font-size:14px;">
+    <button onclick="submitWechat2()"
+            style="background:#1a1a1a; color:#fff; border:none; padding:12px 16px;
+                   border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; white-space:nowrap;">
+        免费领取
+    </button>
+</div>
+<p style="font-size:13px; color:#999; text-align:center;">
+    完整报告包含：深度维度解析 · AI时代发展建议 · 王博士专业点评
+</p>
                 </div>
             </div>
         </div>
@@ -521,6 +528,11 @@
     const wechat = document.getElementById('userWechat').value.trim();
     if (!wechat) { alert('请输入微信号'); return; }
     closePaymentModal();
+    alert('已收到！我们会尽快通过微信联系您，发送完整报告。微信号：' + wechat);
+}
+function submitWechat2() {
+    const wechat = document.getElementById('userWechat2').value.trim();
+    if (!wechat) { alert('请输入微信号'); return; }
     alert('已收到！我们会尽快通过微信联系您，发送完整报告。微信号：' + wechat);
 }
         const questions = [

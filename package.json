@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "description": "AI Co-create Life Personality Assessment",
   "dependencies": {
-    "stripe": "^14.0.0",
     "@sendgrid/mail": "^8.0.0",
     "airtable": "^0.12.0",
     "micro": "^10.0.1",
-    "raw-body": "^2.5.2",
     "pdf-lib": "^1.17.1",
-    "pdfkit": "^0.17.2"
+    "pdfkit": "^0.17.2",
+    "raw-body": "^2.5.2",
+    "resend": "^6.9.4",
+    "stripe": "^14.0.0"
   }
 }

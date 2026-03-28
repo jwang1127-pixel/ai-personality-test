@@ -1,5 +1,7 @@
 const { Resend } = require('resend');
-const { generateReport } = require('../report-generator/generateReport');
+const { generatePersonalityReport } = require('../report-generator/generateReport');
+const path = require('path');
+const fs = require('fs');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -17,18 +19,25 @@ module.exports = async (req, res) => {
     const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@aicocreatelife.com';
     const TO_EMAIL = process.env.ADMIN_EMAIL || FROM_EMAIL;
 
-    // 如果有分数，生成报告
-    let reportHtml = '';
+    let attachments = [];
+
     if (scores) {
       try {
-        const report = await generateReport(scores);
-        reportHtml = `
-          <hr/>
-          <h2>📊 用户完整报告</h2>
-          ${report}
-        `;
+        const testProfile = {
+          name: wechat,
+          date: new Date().toLocaleDateString('zh-CN'),
+          scores: scores
+        };
+        const outputPath = `/tmp/report_${Date.now()}.pdf`;
+        await generatePersonalityReport(testProfile, outputPath);
+        const pdfBuffer = fs.readFileSync(outputPath);
+        attachments = [{
+          filename: `AI共创人生报告_${wechat}.pdf`,
+          content: pdfBuffer.toString('base64'),
+          encoding: 'base64'
+        }];
       } catch (e) {
-        reportHtml = `<p>报告生成失败：${e.message}</p>`;
+        console.error('报告生成失败:', e);
       }
     }
 
@@ -41,8 +50,9 @@ module.exports = async (req, res) => {
         <p><strong>微信号：</strong>${wechat}</p>
         <p><strong>来源：</strong>${source || '未知'}</p>
         <p><strong>时间：</strong>${new Date().toLocaleString('zh-CN')}</p>
-        ${reportHtml}
-      `
+        <p>${attachments.length > 0 ? '✅ 完整报告已附件发送' : '⚠️ 报告生成失败，请手动生成'}</p>
+      `,
+      attachments: attachments
     });
 
     res.status(200).json({ success: true });

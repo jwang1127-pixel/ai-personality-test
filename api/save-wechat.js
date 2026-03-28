@@ -12,6 +12,7 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { wechat, source, scores } = req.body;
+  console.log('收到数据:', JSON.stringify({ wechat, source, scores }));
   if (!wechat) return res.status(400).json({ error: '微信号不能为空' });
 
   try {

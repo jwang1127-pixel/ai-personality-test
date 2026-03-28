@@ -524,17 +524,28 @@
     </div>
 
     <script>
-        function submitWechat() {
+  function submitWechat() {
     const wechat = document.getElementById('userWechat').value.trim();
     if (!wechat) { alert('请输入微信号'); return; }
+    fetch('/api/save-wechat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wechat, source: '弹窗' })
+    });
     closePaymentModal();
-    alert('已收到！我们会尽快通过微信联系您，发送完整报告。微信号：' + wechat);
+    alert('已收到！我们会尽快通过微信联系您发送完整报告。');
 }
 function submitWechat2() {
     const wechat = document.getElementById('userWechat2').value.trim();
     if (!wechat) { alert('请输入微信号'); return; }
-    alert('已收到！我们会尽快通过微信联系您，发送完整报告。微信号：' + wechat);
+    fetch('/api/save-wechat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wechat, source: '结果页' })
+    });
+    alert('已收到！我们会尽快通过微信联系您发送完整报告。');
 }
+
         const questions = [
             {text: "在职业转型过程中，我更倾向于通过社交网络和人脉来寻找新机会", dimension: "extraversion", reverse: false},
             {text: "当面对AI等新技术时，我喜欢与他人讨论和分享学习心得", dimension: "extraversion", reverse: false},

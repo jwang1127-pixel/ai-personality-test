@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>你的AI时代能力重构结果 | AI B School</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+  :root {
+    --ink: #1a1a1a;
+    --ink-soft: #444;
+    --ink-muted: #888;
+    --bg: #faf9f7;
+    --bg-card: #ffffff;
+    --border: #e8e4dd;
+    --accent: #2d5a3d;
+    --accent-light: #e8f0ea;
+    --amber: #b5560a;
+    --amber-light: #fdf0e4;
+    --red-soft: #8b2020;
+    --red-light: #fdeaea;
+    --blue: #1a3a5c;
+    --blue-light: #e8eef5;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* Header */
+  .header {
+    background: var(--ink);
+    color: #fff;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-brand {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 15px;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+  }
+  .header-tag {
+    font-size: 12px;
+    opacity: 0.55;
+    letter-spacing: 0.08em;
+  }
+
+  /* Hero */
+  .hero {
+    background: var(--ink);
+    color: #fff;
+    padding: 40px 24px 52px;
+    text-align: center;
+  }
+  .hero-label {
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    opacity: 0.5;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+  .hero-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(22px, 5vw, 30px);
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+  .hero-subtitle {
+    font-size: 14px;
+    opacity: 0.6;
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Score finder */
+  .score-section {
+    max-width: 640px;
+    margin: -24px auto 0;
+    padding: 0 16px;
+    position: relative;
+    z-index: 10;
+  }
+  .score-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    border: 1px solid var(--border);
+  }
+  .score-card h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .score-card p {
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-bottom: 20px;
+  }
+  .score-guide {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .score-item {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: block;
+  }
+  .score-item:hover { border-color: var(--accent); background: var(--accent-light); }
+  .score-range {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'Noto Serif SC', serif;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .score-name {
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  /* How to score */
+  .how-section {
+    max-width: 640px;
+    margin: 16px auto 0;
+    padding: 0 16px;
+  }
+  .how-card {
+    background: var(--amber-light);
+    border: 1px solid #e8c898;
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .how-card h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--amber);
+    margin-bottom: 10px;
+    letter-spacing: 0.05em;
+  }
+  .score-table {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .score-pill {
+    background: #fff;
+    border: 1px solid #e8c898;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .score-pill strong { color: var(--amber); }
+
+  /* Results */
+  .results-section {
+    max-width: 640px;
+    margin: 32px auto 0;
+    padding: 0 16px;
+  }
+  .results-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink-muted);
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Result card */
+  .result-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .result-header {
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .tag-a { background: var(--red-light); color: var(--red-soft); }
+  .tag-b { background: var(--amber-light); color: var(--amber); }
+  .tag-c { background: var(--accent-light); color: var(--accent); }
+  .tag-d { background: var(--blue-light); color: var(--blue); }
+
+  .result-score {
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-bottom: 6px;
+  }
+  .result-name {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .result-tagline {
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .result-body {
+    padding: 22px 24px;
+  }
+  .result-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+  .result-section-title:first-child { margin-top: 0; }
+
+  .result-desc {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.8;
+    margin-bottom: 4px;
+  }
+
+  .trait-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .trait-list li {
+    font-size: 14px;
+    color: var(--ink-soft);
+    padding-left: 18px;
+    position: relative;
+    line-height: 1.6;
+  }
+  .trait-list li::before {
+    content: '·';
+    position: absolute;
+    left: 6px;
+    color: var(--ink-muted);
+    font-size: 18px;
+    top: -2px;
+  }
+
+  .priority-box {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 10px;
+  }
+  .priority-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-muted);
+    margin-bottom: 4px;
+    letter-spacing: 0.06em;
+  }
+  .priority-text {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+  }
+  .priority-text strong { color: var(--ink); font-weight: 700; }
+
+  /* CTA section */
+  .cta-section {
+    max-width: 640px;
+    margin: 8px auto 0;
+    padding: 0 16px 60px;
+  }
+  .cta-card {
+    background: var(--ink);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .cta-card h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .cta-card p {
+    font-size: 14px;
+    opacity: 0.65;
+    margin-bottom: 24px;
+    line-height: 1.7;
+  }
+  .cta-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cta-btn {
+    display: block;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    cursor: pointer;
+    border: none;
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+  .cta-btn:hover { opacity: 0.85; }
+  .cta-primary { background: #fff; color: var(--ink); }
+  .cta-secondary {
+    background: transparent;
+    color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.35);
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 8px 0;
+  }
+
+  /* Also try test 1 */
+  .also-section {
+    max-width: 640px;
+    margin: 0 auto 0;
+    padding: 0 16px;
+  }
+  .also-card {
+    background: var(--accent-light);
+    border: 1.5px solid #b8d4bc;
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .also-card h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .also-card p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+    line-height: 1.7;
+  }
+  .also-link {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1.5px solid var(--accent);
+    padding-bottom: 1px;
+  }
+
+  /* Anchor nav */
+  .anchor-nav {
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    .score-guide { grid-template-columns: 1fr 1fr; }
+    .hero { padding: 32px 20px 48px; }
+    .result-name { font-size: 19px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <span class="header-brand">AI B School · 美国创新商学院</span>
+  <span class="header-tag">AI时代能力重构</span>
+</header>
+
+<div class="hero">
+  <div class="hero-label">测试结果</div>
+  <h1 class="hero-title">你的AI时代<br>能力重构画像</h1>
+  <p class="hero-subtitle">根据你的12道题答案，对照下方找到你的结果层级，看清你现在真正处于哪个阶段。</p>
+</div>
+
+<!-- Score finder -->
+<div class="score-section">
+  <div class="score-card">
+    <h2>第一步：找到你的总分</h2>
+    <p>把你12道题的答案加总：A=1分，B=2分，C=3分，D=4分，满分48分。</p>
+    <div class="score-guide">
+      <a href="#level-a" class="score-item">
+        <span class="score-range">12–23分</span>
+        <span class="score-name">旧能力惯性区</span>
+      </a>
+      <a href="#level-b" class="score-item">
+        <span class="score-range">24–32分</span>
+        <span class="score-name">工具使用起步区</span>
+      </a>
+      <a href="#level-c" class="score-item">
+        <span class="score-range">33–40分</span>
+        <span class="score-name">人机协作成长区</span>
+      </a>
+      <a href="#level-d" class="score-item">
+        <span class="score-range">41–48分</span>
+        <span class="score-name">智能组织者区</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- How to score -->
+<div class="how-section">
+  <div class="how-card">
+    <h3>选项分值对照</h3>
+    <div class="score-table">
+      <div class="score-pill"><strong>A</strong> = 1分</div>
+      <div class="score-pill"><strong>B</strong> = 2分</div>
+      <div class="score-pill"><strong>C</strong> = 3分</div>
+      <div class="score-pill"><strong>D</strong> = 4分</div>
+    </div>
+  </div>
+</div>
+
+<!-- Results -->
+<div class="results-section">
+  <p class="results-title">↓ 找到你的结果层级</p>
+
+  <!-- Level A -->
+  <div class="result-card" id="level-a">
+    <div class="result-header">
+      <div class="result-tag tag-a">层级一</div>
+      <div class="result-score">12–23分</div>
+      <div class="result-name">旧能力惯性区</div>
+      <div class="result-tagline">你不是不努力，而是还在用旧方式应对新世界。</div>
+    </div>
+    <div class="result-body">
+      <div class="result-section-title">你现在的状态</div>
+      <p class="result-desc">你可能已经知道AI很重要，但在真实的工作、学习或家庭决策中，还没有完成能力升级。你更容易先找答案，而不是先定义问题；把AI当工具，而不是协作对象；面对变化时感到焦虑，却不知从哪里开始。</p>
+      <p class="result-desc">这很正常——因为大多数人从来没有系统训练过AI时代真正需要的能力。</p>
+
+      <div class="result-section-title">你容易遇到的问题</div>
+      <ul class="trait-list">
+        <li>知道很多道理，但不知道先做什么</li>
+        <li>把"学工具"误当成"能力升级"</li>
+        <li>容易焦虑，但焦虑停留在情绪层面，不容易变成行动</li>
+      </ul>
+
+      <div class="result-section-title">你最值得优先重构的三项能力</div>
+      <ul class="trait-list">
+        <li>问题定义能力：把"我很乱"变成一个可以回答的具体问题</li>
+        <li>基本判断力：区分"听起来对"和"真正适合我"</li>
+        <li>初步人机协作意识：AI不是答案机，是需要你引导的协作对象</li>
+      </ul>
+
+      <div class="priority-box">
+        <div class="priority-label">你的下一步</div>
+        <div class="priority-text">先别急着追更多工具。你更需要先看清：<strong>AI时代到底改变了什么，人最该先训练什么能力。</strong>参加一场说明讲座，是现在最适合你的一步。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level B -->
+  <div class="result-card" id="level-b">
+    <div class="result-header">
+      <div class="result-tag tag-b">层级二</div>
+      <div class="result-score">24–32分</div>
+      <div class="result-name">工具使用起步区</div>
+      <div class="result-tagline">你已经开始变了，但还没有形成稳定的新能力结构。</div>
+    </div>
+    <div class="result-body">
+      <div class="result-section-title">你现在的状态</div>
+      <p class="result-desc">你已经愿意接触AI，也做过一些尝试。但你目前更像是：会用一点，但不成系统；学了一些，但比较零散；知道要变，但不清楚先练什么。你不是没有开始，而是正处在"起步但未成形"的阶段。</p>
+
+      <div class="result-section-title">你容易遇到的问题</div>
+      <ul class="trait-list">
+        <li>工具接触不少，但方法还不稳定——今天会用，明天又不用了</li>
+        <li>知识在增加，判断却未必同步增强</li>
+        <li>热情和焦虑并存，容易在"想升级"和"越学越乱"之间反复</li>
+      </ul>
+
+      <div class="result-section-title">你最值得优先重构的三项能力</div>
+      <ul class="trait-list">
+        <li>提问与问题定义能力：AI能不能帮到你，取决于你能不能把问题说清楚</li>
+        <li>判断与筛选能力：AI时代最大风险是被"像答案"的东西带着走</li>
+        <li>稳定的人机协作方法：形成几个固定习惯，而不是零散使用</li>
+      </ul>
+
+      <div class="priority-box">
+        <div class="priority-label">你的下一步</div>
+        <div class="priority-text">你现在最需要的，不是继续零散尝试，而是把改变<strong>组织成一套稳定方法</strong>。参加一场讲座，或预约一次能力重构诊断。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level C -->
+  <div class="result-card" id="level-c">
+    <div class="result-header">
+      <div class="result-tag tag-c">层级三</div>
+      <div class="result-score">33–40分</div>
+      <div class="result-name">人机协作成长区</div>
+      <div class="result-tagline">你已经不只是使用AI，而是在开始与AI协作。</div>
+    </div>
+    <div class="result-body">
+      <div class="result-section-title">你现在的状态</div>
+      <p class="result-desc">你已经明显进入AI时代的新能力结构。你不只是知道工具存在，而是开始在真实任务中使用AI，具备一定的判断意识、任务拆解能力和协作意识。你的问题不再是"懂不懂AI"，而是"如何把能力进一步系统化"。</p>
+
+      <div class="result-section-title">你容易遇到的问题</div>
+      <ul class="trait-list">
+        <li>会用，但还偏个人化，还没有把方法固定成可复用的流程</li>
+        <li>协作能力有了，但组织能力还在成长中</li>
+        <li>容易停在"效率提升"，还没完全进入"价值重构"</li>
+      </ul>
+
+      <div class="result-section-title">你最值得优先升级的三项能力</div>
+      <ul class="trait-list">
+        <li>系统化能力：把零散的"会用"升级为固定的"会组织完成"</li>
+        <li>组织智能能力：从"自己会用"升级为"能带动家庭或团队一起进入新系统"</li>
+        <li>复杂任务重组能力：拆开、重组、分配给不同智能体完成</li>
+      </ul>
+
+      <div class="priority-box">
+        <div class="priority-label">你的下一步</div>
+        <div class="priority-text">你已经过了先建立认知的阶段，<strong>更适合一次能力重构诊断</strong>，根据你的现实场景做具体升级。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level D -->
+  <div class="result-card" id="level-d">
+    <div class="result-header">
+      <div class="result-tag tag-d">层级四</div>
+      <div class="result-score">41–48分</div>
+      <div class="result-name">智能组织者区</div>
+      <div class="result-tagline">你已经具备成为AI时代"智能组织者"的基础。</div>
+    </div>
+    <div class="result-body">
+      <div class="result-section-title">你现在的状态</div>
+      <p class="result-desc">你已经超出"学工具"的层面，更接近能够判断、整合、协作，并逐步组织人、AI、工具和流程共同创造价值的人。未来真正稀缺的，不只是个人能干，而是能组织更高层次智能系统的人——你正在走向这里。</p>
+
+      <div class="result-section-title">你容易遇到的问题</div>
+      <ul class="trait-list">
+        <li>个人能力强，但还需要把能力转化为可复制、可协同的系统</li>
+        <li>需要从"会组织"走向"会引导"——让别人也能跟上</li>
+        <li>能力还没有完全连接到长期事业、家庭系统或更大的价值容器</li>
+      </ul>
+
+      <div class="result-section-title">你最值得强化的三项能力</div>
+      <ul class="trait-list">
+        <li>长期系统设计能力：把个人能力转成长期可持续的系统</li>
+        <li>协作放大能力：让更多人、工具、流程协同起来</li>
+        <li>价值创造路径能力：把能力明确连接到家庭、事业或项目</li>
+      </ul>
+
+      <div class="priority-box">
+        <div class="priority-label">你的下一步</div>
+        <div class="priority-text">你不再需要基础认知类内容，更适合<strong>高阶诊断或共创项目</strong>——把你的能力放进更大的价值系统中。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Also try test 1 -->
+<div class="also-section">
+  <div class="also-card">
+    <h3>还没做过第一测？</h3>
+    <p>第二测告诉你"你现在缺什么能力"。第一测告诉你"你是什么类型的人、AI时代的天然优势在哪里"。两测合在一起，才是完整的画像。</p>
+    <a href="https://www.aicocreatelife.com" class="also-link">→ 做第一测：AI时代发展倾向测试</a>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-card">
+    <h2>知道自己在哪层，<br>下一步该怎么走？</h2>
+    <p>光知道层级还不够。更重要的是，根据你的现实情况，找到真正值得优先重构的方向。</p>
+    <div class="cta-options">
+      <a href="https://www.aibschool.us" class="cta-btn cta-primary">了解 AI B School 能力重构课程</a>
+      <a href="https://forms.gle/edYauJpGgupLvvzp9" class="cta-btn cta-secondary">← 重新做第二测</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        const offset = 20;
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,3 +1,5 @@
+const { calculateThreeForces } = require('../report-generator/threeForcesSection');
+
 module.exports = async (req, res) => {
   console.log('Environment check:');
   console.log('STRIPE_SECRET_KEY exists:', !!process.env.STRIPE_SECRET_KEY);
@@ -19,6 +21,10 @@ module.exports = async (req, res) => {
   try {
     const { product_name, description, amount, email, name, age_group, product_type, scores, base_url } = req.body;
     
+    // 计算三力（用于结果页预览）
+    const tf = calculateThreeForces(scores || {});
+    const tfParams = `&vf=${tf.visionForce}&jf=${tf.judgmentForce}&cf=${tf.creativityForce}&tt=${tf.thinkingType}`;
+
     // 创建 session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -34,7 +40,7 @@ module.exports = async (req, res) => {
         quantity: 1
       }],
       mode: 'payment',
-      success_url: `${base_url}/success.html?session_id={CHECKOUT_SESSION_ID}&product=${product_type}&amount=${amount}&email=${email}`,
+      success_url: `${base_url}/success.html?session_id={CHECKOUT_SESSION_ID}&product=${product_type}&amount=${amount}&email=${email}${tfParams}`,
       cancel_url: `${base_url}?cancelled=true`,
       customer_email: email,
       metadata: {

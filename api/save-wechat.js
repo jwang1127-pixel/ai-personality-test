@@ -1,6 +1,5 @@
 const { Resend } = require('resend');
-const { generatePersonalityReport } = require('../report-generator/generateReport');
-const fs = require('fs');
+const https = require('https');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -19,7 +18,7 @@ module.exports = async (req, res) => {
     const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@aicocreatelife.com';
     const TO_EMAIL = process.env.ADMIN_EMAIL || FROM_EMAIL;
 
-    // 立即发送通知邮件
+    // 发送通知邮件给James
     await resend.emails.send({
       from: FROM_EMAIL,
       to: TO_EMAIL,
@@ -33,40 +32,31 @@ module.exports = async (req, res) => {
       `
     });
 
-    // 立即返回成功给用户
+    // 立即返回成功
     res.status(200).json({ success: true });
 
-    // 异步生成报告并发送（不阻塞用户）
+    // 调用send-report API生成并发送报告
     if (scores && Object.keys(scores).length > 0) {
-      try {
-        const testProfile = {
-          name: wechat,
-          date: new Date().toLocaleDateString('zh-CN'),
-          scores: scores
-        };
-        const outputPath = `/tmp/report_${Date.now()}.pdf`;
-        await generatePersonalityReport(testProfile, outputPath);
-        const pdfBuffer = fs.readFileSync(outputPath);
+      const postData = JSON.stringify({
+        email: TO_EMAIL,
+        name: wechat,
+        scores: scores
+      });
 
-        await resend.emails.send({
-          from: FROM_EMAIL,
-          to: TO_EMAIL,
-          subject: `📊 用户报告已生成 - ${wechat}`,
-          html: `
-            <h2>用户报告已生成</h2>
-            <p><strong>微信号：</strong>${wechat}</p>
-            <p>完整报告见附件，请通过微信发送给用户。</p>
-          `,
-          attachments: [{
-            filename: `AI共创人生报告_${wechat}.pdf`,
-            content: pdfBuffer.toString('base64'),
-            encoding: 'base64'
-          }]
-        });
-        console.log('报告发送成功:', wechat);
-      } catch (e) {
-        console.error('报告生成失败:', e.message);
-      }
+      const options = {
+        hostname: 'www.aicocreatelife.com',
+        path: '/api/send-report',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData)
+        }
+      };
+
+      const request = https.request(options);
+      request.write(postData);
+      request.end();
+      console.log('已触发报告生成');
     }
 
   } catch (error) {

@@ -1,6 +1,5 @@
 const { Resend } = require('resend');
 const { generatePersonalityReport } = require('../report-generator/generateReport');
-const path = require('path');
 const fs = require('fs');
 
 module.exports = async (req, res) => {
@@ -20,42 +19,27 @@ module.exports = async (req, res) => {
     const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@aicocreatelife.com';
     const TO_EMAIL = process.env.ADMIN_EMAIL || FROM_EMAIL;
 
-    let attachments = [];
+    // 立即发送通知邮件
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: TO_EMAIL,
+      subject: `新用户留下微信号 - ${wechat}`,
+      html: `
+        <h2>新用户留下微信号</h2>
+        <p><strong>微信号：</strong>${wechat}</p>
+        <p><strong>来源：</strong>${source || '未知'}</p>
+        <p><strong>时间：</strong>${new Date().toLocaleString('zh-CN')}</p>
+        <p>⏳ 完整报告正在生成，稍后会单独发送到此邮箱。</p>
+      `
+    });
 
-    // 异步生成报告，不等待
-if (scores) {
-  (async () => {
-    try {
-      const testProfile = {
-        name: wechat,
-        date: new Date().toLocaleDateString('zh-CN'),
-        scores: scores
-      };
-      const outputPath = `/tmp/report_${Date.now()}.pdf`;
-      await generatePersonalityReport(testProfile, outputPath);
-      const pdfBuffer = fs.readFileSync(outputPath);
-      
-      await resend.emails.send({
-        from: FROM_EMAIL,
-        to: TO_EMAIL,
-        subject: `📊 用户报告已生成 - ${wechat}`,
-        html: `
-          <h2>用户报告已生成</h2>
-          <p><strong>微信号：</strong>${wechat}</p>
-          <p><strong>时间：</strong>${new Date().toLocaleString('zh-CN')}</p>
-          <p>完整报告见附件，请通过微信发送给用户。</p>
-        `,
-        attachments: [{
-          filename: `AI共创人生报告_${wechat}.pdf`,
-          content: pdfBuffer.toString('base64'),
-          encoding: 'base64'
-        }]
-      });
-    } catch (e) {
-      console.error('报告生成失败:', e.message);
-    }
-  })();
-}
+    // 立即返回成功给用户
+    res.status(200).json({ success: true });
+
+    // 异步生成报告并发送（不阻塞用户）
+    if (scores && Object.keys(scores).length > 0) {
+      try {
+        const testProfile = {
           name: wechat,
           date: new Date().toLocaleDateString('zh-CN'),
           scores: scores
@@ -63,30 +47,28 @@ if (scores) {
         const outputPath = `/tmp/report_${Date.now()}.pdf`;
         await generatePersonalityReport(testProfile, outputPath);
         const pdfBuffer = fs.readFileSync(outputPath);
-        attachments = [{
-          filename: `AI共创人生报告_${wechat}.pdf`,
-          content: pdfBuffer.toString('base64'),
-          encoding: 'base64'
-        }];
+
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: TO_EMAIL,
+          subject: `📊 用户报告已生成 - ${wechat}`,
+          html: `
+            <h2>用户报告已生成</h2>
+            <p><strong>微信号：</strong>${wechat}</p>
+            <p>完整报告见附件，请通过微信发送给用户。</p>
+          `,
+          attachments: [{
+            filename: `AI共创人生报告_${wechat}.pdf`,
+            content: pdfBuffer.toString('base64'),
+            encoding: 'base64'
+          }]
+        });
+        console.log('报告发送成功:', wechat);
       } catch (e) {
-        console.error('报告生成失败:', e);
+        console.error('报告生成失败:', e.message);
       }
     }
 
-   await resend.emails.send({
-  from: FROM_EMAIL,
-  to: TO_EMAIL,
-  subject: `新用户留下微信号 - ${wechat}`,
-  html: `
-    <h2>新用户留下微信号</h2>
-    <p><strong>微信号：</strong>${wechat}</p>
-    <p><strong>来源：</strong>${source || '未知'}</p>
-    <p><strong>时间：</strong>${new Date().toLocaleString('zh-CN')}</p>
-    <p>⏳ 完整报告正在生成，稍后会单独发送到此邮箱。</p>
-  `
-});
-
-    res.status(200).json({ success: true });
   } catch (error) {
     console.error('失败:', error);
     res.status(500).json({ error: '发送失败' });

@@ -79,8 +79,8 @@ module.exports = async (req, res) => {
     
     const emailData = JSON.stringify({
       from: `AI共创人生团队 <${FROM_EMAIL}>`,
-      to: [email],
-      subject: `${name}，您的 AI 共创人生 18 页专业分析报告`,
+     to: [process.env.ADMIN_EMAIL || email],
+     subject: `用户报告 - 微信: ${name} - 19页专业分析报告`,
       html: emailHtml,
       attachments: [{
         filename: `${name}_人格分析报告.pdf`,

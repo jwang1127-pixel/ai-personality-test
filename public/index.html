@@ -524,13 +524,13 @@
     </div>
 
     <script>
-  function submitWechat() {
+ function submitWechat() {
     const wechat = document.getElementById('userWechat').value.trim();
     if (!wechat) { alert('请输入微信号'); return; }
     fetch('/api/save-wechat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wechat, source: '弹窗' })
+        body: JSON.stringify({ wechat, source: '弹窗', scores: testScores })
     });
     closePaymentModal();
     alert('已收到！我们会尽快通过微信联系您发送完整报告。');
@@ -538,10 +538,11 @@
 function submitWechat2() {
     const wechat = document.getElementById('userWechat2').value.trim();
     if (!wechat) { alert('请输入微信号'); return; }
+    const savedScores = JSON.parse(sessionStorage.getItem('userScores') || '{}');
     fetch('/api/save-wechat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wechat, source: '结果页' })
+        body: JSON.stringify({ wechat, source: '结果页', scores: savedScores })
     });
     alert('已收到！我们会尽快通过微信联系您发送完整报告。');
 }
@@ -702,6 +703,7 @@ function submitWechat2() {
             });
 
             testScores = scores;
+            sessionStorage.setItem('userScores', JSON.stringify(scores));
             showPreviewResults(scores);
         }
 

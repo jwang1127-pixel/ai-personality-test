@@ -539,11 +539,25 @@ function submitWechat2() {
     const wechat = document.getElementById('userWechat2').value.trim();
     if (!wechat) { alert('请输入微信号'); return; }
     const savedScores = JSON.parse(sessionStorage.getItem('userScores') || '{}');
+    
+    // 第一个请求：通知James
     fetch('/api/save-wechat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ wechat, source: '结果页', scores: savedScores })
     });
+    
+    // 第二个请求：生成报告发到James邮箱
+    fetch('/api/send-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            email: 'jwang1127@gmail.com',
+            name: wechat, 
+            scores: savedScores 
+        })
+    });
+    
     alert('已收到！我们会尽快通过微信联系您发送完整报告。');
 }
 

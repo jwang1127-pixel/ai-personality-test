@@ -45,6 +45,48 @@
             opacity: 0.9;
             margin-bottom: 10px;
         }
+
+        .header .brand-en {
+            font-size: 0.55em;
+            font-weight: 400;
+            letter-spacing: 2px;
+            opacity: 0.85;
+            margin-top: 4px;
+            margin-bottom: 6px;
+        }
+
+        .site-footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8em;
+            color: #999;
+            border-top: 1px solid #eee;
+        }
+
+        .site-footer .brand-en {
+            letter-spacing: 1px;
+        }
+
+        .bschool-banner {
+            background: #fff8e6;
+            border: 1px solid #f0d896;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 18px 20px 0 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #5a4a1f;
+        }
+
+        .bschool-banner a {
+            color: #a8721c;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .bschool-banner a:hover {
+            text-decoration: underline;
+        }
         
         .content {
             padding: 40px;
@@ -432,14 +474,21 @@
     
     <div class="container">
         <div class="header">
-            <h1>🧠 AI共创人生</h1>
+            <div class="brand-en">AI COCREATE LIFE</div>
+            <h1>AI共创人生</h1>
             <p>专业性格评估测试</p>
+        </div>
+
+        <div class="bschool-banner">
+            🎒 <strong>AI B School</strong> 秋季创造力项目营 · 高中生AI真项目升学营 ·
+            <a href="https://aibschool.us" target="_blank" rel="noopener">了解详情/报名 →</a>
         </div>
         
         <div class="content">
             <!-- 介绍和开始按钮 -->
             <div class="intro-section" id="introSection">
-                <h2>🌟 发现您的AI时代独特优势</h2>
+                <h2>🌟 AI时代能力测试与发展分析</h2>
+                <p style="font-size: 0.85em; color: #888; font-style: italic;">AI-powered personality and capability assessment platform</p>
                 <p>30道科学问题，5分钟深度测试</p>
                 <p>立即了解您在AI时代的性格优势和发展方向</p>
                 <p style="margin-top: 20px; font-size: 0.9em; color: #999;">
@@ -494,6 +543,12 @@
 </p>
                 </div>
             </div>
+        </div>
+
+        <div class="site-footer">
+            <div class="brand-en">AI COCREATE LIFE</div>
+            <div>AI共创人生</div>
+            <div style="margin-top: 6px; font-size: 0.9em; color: #aaa;">&copy; 2026 AI B School</div>
         </div>
     </div>
     
@@ -737,6 +792,51 @@ function submitWechat2() {
             const dimensionsHTML = `
                 <div class="dimension-preview">
                     <div class="dimension-header">
+                        <span class="dimension-name">💡 创新开放</span>
+                        <span class="dimension-score">${scores.openness}%</span>
+                    </div>
+                    <div class="score-bar"><div class="score-fill" style="width: ${scores.openness}%"></div></div>
+                    <div class="preview-text">${getShortDescription('openness', scores.openness)}</div>
+                    <div class="blurred-content">
+                        <p style="color: #999;">深度分析内容、AI时代建议、具体案例...</p>
+                        <div class="blur-overlay">
+                            <span class="unlock-badge">🔒 解锁完整分析</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dimension-preview">
+                    <div class="dimension-header">
+                        <span class="dimension-name">⚡ 执行可靠</span>
+                        <span class="dimension-score">${scores.conscientiousness}%</span>
+                    </div>
+                    <div class="score-bar"><div class="score-fill" style="width: ${scores.conscientiousness}%"></div></div>
+                    <div class="preview-text">${getShortDescription('conscientiousness', scores.conscientiousness)}</div>
+                    <div class="blurred-content">
+                        <p style="color: #999;">深度分析内容、AI时代建议、具体案例...</p>
+                        <div class="blur-overlay">
+                            <span class="unlock-badge">🔒 解锁完整分析</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dimension-preview">
+                    <div class="dimension-header">
+                        <span class="dimension-name">🤝 协作共情</span>
+                        <span class="dimension-score">${scores.agreeableness}%</span>
+                    </div>
+                    <div class="score-bar"><div class="score-fill" style="width: ${scores.agreeableness}%"></div></div>
+                    <div class="preview-text">${getShortDescription('agreeableness', scores.agreeableness)}</div>
+                    <div class="blurred-content">
+                        <p style="color: #999;">深度分析内容、AI时代建议、具体案例...</p>
+                        <div class="blur-overlay">
+                            <span class="unlock-badge">🔒 解锁完整分析</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dimension-preview">
+                    <div class="dimension-header">
                         <span class="dimension-name">💬 社交活力</span>
                         <span class="dimension-score">${scores.extraversion}%</span>
                     </div>
@@ -888,49 +988,4 @@ function submitWechat2() {
         }
     </script>
 </body>
-</html>锁完整分析</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="dimension-preview">
-                    <div class="dimension-header">
-                        <span class="dimension-name">💡 创新开放</span>
-                        <span class="dimension-score">${scores.openness}%</span>
-                    </div>
-                    <div class="score-bar"><div class="score-fill" style="width: ${scores.openness}%"></div></div>
-                    <div class="preview-text">${getShortDescription('openness', scores.openness)}</div>
-                    <div class="blurred-content">
-                        <p style="color: #999;">深度分析内容、AI时代建议、具体案例...</p>
-                        <div class="blur-overlay">
-                            <span class="unlock-badge">🔒 解锁完整分析</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="dimension-preview">
-                    <div class="dimension-header">
-                        <span class="dimension-name">⚡ 执行可靠</span>
-                        <span class="dimension-score">${scores.conscientiousness}%</span>
-                    </div>
-                    <div class="score-bar"><div class="score-fill" style="width: ${scores.conscientiousness}%"></div></div>
-                    <div class="preview-text">${getShortDescription('conscientiousness', scores.conscientiousness)}</div>
-                    <div class="blurred-content">
-                        <p style="color: #999;">深度分析内容、AI时代建议、具体案例...</p>
-                        <div class="blur-overlay">
-                            <span class="unlock-badge">🔒 解锁完整分析</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="dimension-preview">
-                    <div class="dimension-header">
-                        <span class="dimension-name">🤝 协作共情</span>
-                        <span class="dimension-score">${scores.agreeableness}%</span>
-                    </div>
-                    <div class="score-bar"><div class="score-fill" style="width: ${scores.agreeableness}%"></div></div>
-                    <div class="preview-text">${getShortDescription('agreeableness', scores.agreeableness)}</div>
-                    <div class="blurred-content">
-                        <p style="color: #999;">深度分析内容、AI时代建议、具体案例...</p>
-                        <div class="blur-overlay">
-                            <span class="unlock-badge">🔒 解
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI时代，我的路在何方？｜AI CoCreate Life 公益讲座</title>
+<meta name="description" content="AI CoCreate Life 尔湾公益活动报名：一起讨论AI时代的学业、就业、创业和人生方向。">
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;color:#193147;background:#f4f7fb}*{box-sizing:border-box}body{margin:0}header{background:#153d5a;color:white;padding:22px max(20px,calc((100vw - 920px)/2))}header a{color:#dbebff;text-decoration:none}.brand{letter-spacing:.12em;font-size:13px}main{max-width:920px;margin:30px auto 60px;padding:0 18px}.hero,.panel{background:white;border-radius:18px;padding:28px;box-shadow:0 5px 25px #173e5820}.hero{background:linear-gradient(125deg,#164b72,#337b90);color:white}.hero h1{font-size:clamp(28px,5vw,43px);margin:8px 0 12px}.hero p{line-height:1.8}.tag{display:inline-block;padding:5px 11px;border:1px solid #bedce5;border-radius:40px;margin:6px 6px 0 0;font-size:13px}.panel{margin-top:20px}h2{font-size:23px;margin:0 0 18px}label,legend{display:block;font-weight:650;margin:18px 0 7px}input[type=text],input[type=email],select,textarea{width:100%;border:1px solid #aabaca;border-radius:9px;font:inherit;padding:12px;background:#fff}textarea{min-height:85px}fieldset{border:0;margin:0;padding:0}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.choices label,.checkline{font-weight:400;display:flex;align-items:flex-start;gap:8px;margin:8px 0;line-height:1.5}.checkline input,.choices input{margin-top:4px}.hint{color:#526679;font-size:13px;line-height:1.6}.honeypot{position:absolute;left:-9999px;opacity:0}button{margin-top:22px;border:0;border-radius:10px;background:#176c8b;color:white;padding:14px 24px;font:inherit;font-weight:700;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.notice{padding:16px;border-radius:10px;margin-top:18px;line-height:1.7}.ok{background:#e6f6ef;color:#17523c}.error{background:#fff0ec;color:#8a3522}.links a{display:inline-block;margin:8px 15px 0 0;color:#145f80}footer{text-align:center;font-size:13px;color:#536879;padding:26px}@media(max-width:650px){.choices{grid-template-columns:1fr}.hero,.panel{padding:22px}}
+</style>
+</head>
+<body>
+<header><div class="brand">AI COCREATE LIFE · AI共创人生</div><p><a href="/">返回AI测评首页</a></p></header>
+<main>
+<section class="hero">
+<div><span class="tag">公益活动</span><span class="tag">尔湾线下</span><span class="tag">免费 · 席位有限</span></div>
+<h1>AI时代，我的路在何方？</h1>
+<p>从2030年能力变化，看学业、就业、创业的新机会。通过真实案例与讨论，一起寻找下一步行动。</p>
+<p>主讲：王青平 James Wang（王博）<br>地点：Irvine, California<br>活动日期、时间及详细地点：确定后向报名者通知</p>
+</section>
+<section class="panel">
+<h2>活动报名</h2>
+<p class="hint">无需注册会员即可报名。提交信息表示申请参加，并不等于获得席位；确认安排将通过您提供的邮箱通知。</p>
+<form id="eventForm">
+<label for="name">姓名 *</label><input id="name" name="name" type="text" autocomplete="name" required maxlength="80">
+<label for="email">电子邮箱（接收确认）*</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="254">
+<label for="wechat">微信号（选填）</label><input id="wechat" name="wechat" type="text" maxlength="100">
+<label for="identity">您的身份 *</label><select id="identity" name="identity" required><option value="">请选择</option><option>家长</option><option>中学生／大学生</option><option>职场人士</option><option>创业者</option><option>其他</option></select>
+<label for="grade">孩子的年级（选填）</label><input id="grade" name="grade" type="text" maxlength="50" placeholder="例如：10年级">
+<fieldset><legend>您最关心的话题（可多选）</legend><div class="choices">
+<label><input type="checkbox" name="topics" value="学业与大学升学">学业与大学升学</label>
+<label><input type="checkbox" name="topics" value="竞赛与企业实习">竞赛与企业实习</label>
+<label><input type="checkbox" name="topics" value="就业与职场转型">就业与职场转型</label>
+<label><input type="checkbox" name="topics" value="创业与AI商业项目">创业与AI商业项目</label>
+<label><input type="checkbox" name="topics" value="AI时代的人生方向">AI时代的人生方向</label>
+</div></fieldset>
+<label for="question">您希望现场讨论什么问题？（选填）</label><textarea id="question" name="question" maxlength="1500"></textarea>
+<div class="honeypot" aria-hidden="true"><label for="website">网站</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+<label class="checkline"><input type="checkbox" name="consent" required>我同意主办方仅为本次活动报名、席位确认与必要通知使用上述信息。后续社群或课程信息需要另行征得我的同意。 *</label>
+<p class="hint">请勿在表单中填写敏感个人资料、医疗或财务信息。若为未成年人，建议由家长或监护人报名。报名信息不会在公开网页显示。</p>
+<button type="submit" id="submitBtn">提交报名申请</button><div id="result" role="status" aria-live="polite"></div>
+</form>
+</section>
+<section class="panel"><h2>活动之外，自愿探索</h2><p>报名不要求完成AI测评，也不要求加入社群。</p><div class="links"><a href="/">体验现有AI测评</a><a href="https://aibschool.us" rel="noopener">了解AI B School</a></div><p class="hint">会员社区将在真实可用并完成隐私管理功能后另行开放。</p></section>
+</main>
+<footer>AI CoCreate Life · AI共创人生</footer>
+<script>
+const form=document.getElementById('eventForm'),btn=document.getElementById('submitBtn'),result=document.getElementById('result');
+form.addEventListener('submit',async(e)=>{
+e.preventDefault();if(!form.reportValidity())return;
+btn.disabled=true;result.className='';result.textContent='正在提交……';
+const fd=new FormData(form);
+const payload={name:fd.get('name'),email:fd.get('email'),wechat:fd.get('wechat'),identity:fd.get('identity'),grade:fd.get('grade'),topics:fd.getAll('topics'),question:fd.get('question'),consent:fd.get('consent')==='on',website:fd.get('website')};
+try{
+const response=await fetch('/api/event-register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+const data=await response.json().catch(()=>({}));
+if(!response.ok)throw new Error(data.error||'暂时无法提交，请稍后再试。');
+result.className='notice ok';result.textContent=data.message||'报名申请已收到，我们将联系您确认。';form.reset();
+}catch(err){result.className='notice error';result.textContent=err.message||'网络异常，请稍后重试。'}
+finally{btn.disabled=false}
+});
+</script>
+</body></html>

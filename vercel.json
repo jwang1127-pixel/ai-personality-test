@@ -16,7 +16,7 @@
     },
     {
       "src": "/events/?",
-      "dest": "/public/events.html"
+      "dest": "/events.html"
     },
     {
       "src": "/(.*)",

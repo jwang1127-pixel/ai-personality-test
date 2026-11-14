@@ -36,8 +36,18 @@
 <label for="question">您希望现场讨论什么问题？（选填）</label><textarea id="question" name="question" maxlength="1500"></textarea>
 <div class="honeypot" aria-hidden="true"><label for="website">网站</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
 <label class="checkline"><input type="checkbox" name="consent" required>我同意主办方仅为本次活动报名、席位确认与必要通知使用上述信息。后续社群或课程信息需要另行征得我的同意。 *</label>
-<p class="hint">资料使用说明：姓名、邮箱、选填微信及报名问题仅用于本次活动的报名管理、席位确认与必要通知。报名资料存放于主办方管理的 Airtable 数据表，不会在公开网页展示；不会因报名而自动订阅营销信息。请勿填写敏感个人、医疗或财务信息。未成年人建议由家长或监护人报名。活动结束后的保存期限与删除方式将在正式开放报名前公布。</p>
+<p class="hint">资料使用说明：姓名、邮箱、选填微信及报名问题仅用于本次活动的报名管理、席位确认与必要通知。报名资料存放于主办方管理的 Airtable 数据表，不会在公开网页展示；不会因报名而自动订阅营销信息。请勿填写敏感个人、医疗或财务信息。未成年人建议由家长或监护人报名。报名资料原则上在2027年2月17日前清理（活动结束后90天）；如依法需要保留部分记录，则仅在必要范围内保留。您可使用下方的资料查询或删除申请表提出请求。主办方处理删除请求前，将先核验申请人与报名邮箱的关系。</p>
 <button type="submit" id="submitBtn">提交报名申请</button><div id="result" role="status" aria-live="polite"></div>
+</form>
+</section>
+<section class="panel" id="privacy-requests">
+<h2>查询或删除报名资料</h2>
+<p class="hint">如需查询或删除您在本次活动中提交的报名资料，请使用报名时填写的邮箱提交请求。我们会先进行身份核验，再处理资料请求。此表单不订阅任何推广消息。</p>
+<form id="privacyForm">
+<label for="privacyEmail">报名邮箱 *</label><input id="privacyEmail" name="email" type="email" autocomplete="email" required maxlength="254">
+<label for="privacyType">请求类型 *</label><select id="privacyType" name="type" required><option value="">请选择</option><option value="Access">查询报名资料</option><option value="Delete">删除报名资料</option></select>
+<div class="honeypot" aria-hidden="true"><label for="privacyWebsite">留空</label><input id="privacyWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+<button type="submit" id="privacyBtn">提交资料请求</button><div id="privacyResult" role="status" aria-live="polite"></div>
 </form>
 </section>
 <section class="panel"><h2>活动之外，自愿探索</h2><p>报名不要求完成AI测评，也不要求加入社群。</p><div class="links"><a href="/">体验现有AI测评</a><a href="https://aibschool.us" rel="noopener">了解AI B School</a></div><p class="hint">会员社区将在真实可用并完成隐私管理功能后另行开放。</p></section>
@@ -57,6 +67,20 @@ if(!response.ok)throw new Error(data.error||'暂时无法提交，请稍后再�
 result.className='notice ok';result.textContent=data.message||'报名申请已收到，我们将联系您确认。';form.reset();
 }catch(err){result.className='notice error';result.textContent=err.message||'网络异常，请稍后重试。'}
 finally{btn.disabled=false}
+});
+
+const privacyForm=document.getElementById('privacyForm'),privacyBtn=document.getElementById('privacyBtn'),privacyResult=document.getElementById('privacyResult');
+privacyForm.addEventListener('submit',async e=>{
+e.preventDefault();if(!privacyForm.reportValidity())return;
+privacyBtn.disabled=true;privacyResult.className='';privacyResult.textContent='正在提交……';
+const fd=new FormData(privacyForm);
+try{
+const response=await fetch('/api/event-privacy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:fd.get('email'),type:fd.get('type'),website:fd.get('website')})});
+const data=await response.json().catch(()=>({}));
+if(!response.ok)throw new Error(data.error||'暂时无法提交');
+privacyResult.className='notice ok';privacyResult.textContent=data.message||'请求已收到';privacyForm.reset();
+}catch(err){privacyResult.className='notice error';privacyResult.textContent=err.message||'网络异常，请稍后重试'}
+finally{privacyBtn.disabled=false}
 });
 </script>
 </body></html>

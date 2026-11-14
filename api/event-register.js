@@ -55,7 +55,7 @@ module.exports = async (req, res) => {
   const inputsWithinLimits = [
     ['name',80],['email',254],['wechat',100],['identity',40],['grade',50],['question',1500]
   ].every(([k,max]) => body[k] == null || (typeof body[k] === 'string' && body[k].length <= max));
-  if (!inputsWithinLimits || !name || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || !ALLOWED_IDENTITIES.has(identity) || body.consent !== true || !Array.isArray(body.topics) || body.topics.length > 10 || body.topics.some(t=>!ALLOWED_TOPICS.has(t))) {
+  if (!inputsWithinLimits || !name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !ALLOWED_IDENTITIES.has(identity) || body.consent !== true || !Array.isArray(body.topics) || body.topics.length > 10 || body.topics.some(t=>!ALLOWED_TOPICS.has(t))) {
     return res.status(400).json({error:'请填写姓名、有效邮箱、身份并同意报名信息使用说明。'});
   }
   const key = process.env.AIRTABLE_API_KEY;

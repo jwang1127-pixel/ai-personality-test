@@ -15,6 +15,10 @@
       "dest": "/api/$1"
     },
     {
+      "src": "/events/?",
+      "dest": "/events.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/public/$1"
     }

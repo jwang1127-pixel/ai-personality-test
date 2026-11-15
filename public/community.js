@@ -88,7 +88,7 @@ async function init(){
    else {msg('recoveryMsg','新密码已保存，可以继续使用账户。');$('newPassword').value='';show('recoveryCard',false);await refresh()}
    $('recoveryBtn').disabled=false;
  };
- await refresh();
+ if($('recoveryCard').classList.contains('hidden'))await refresh();
  const hash=new URLSearchParams(location.hash.substring(1));
  if(hash.has('error_description'))msg('authMsg',hash.get('error_description'),true);
 }

@@ -29,6 +29,49 @@ function airtableRequest(method, path, key, body) {
   });
 }
 
+// Notify the event organizer only after the new Airtable record is created.
+// Resend accepts the message; inbox delivery is not guaranteed by this response.
+function sendOrganizerNotification({name, submittedAt, testMode}) {
+  const token = process.env.RESEND_API_KEY;
+  const from = process.env.FROM_EMAIL;
+  const to = process.env.ADMIN_EMAIL;
+  if (!token || !from || !to) return Promise.reject(new Error('Notification mail settings are missing'));
+  const subject = (testMode ? '[测试] ' : '') + 'AI CoCreate Life：收到新的活动报名申请';
+  const payload = JSON.stringify({
+    from, to: [to], subject,
+    text: [
+      testMode ? '这是系统测试记录，不是真实报名。' : '网站收到一份新的活动报名申请。',
+      '活动：AI时代，我的路在何方？',
+      '时间：2026年11月19日 10:00–11:30',
+      '报名者：' + name,
+      '提交时间（UTC）：' + submittedAt,
+      '请登录 Airtable → AI Personality Test Data → Event Registrations 查看详情。',
+      '该申请状态为 Pending，尚未确认席位；请核对并单独通知报名者。',
+      '这封邮件不包含报名者邮箱、微信号及自由填写的隐私信息。'
+    ].join('\n')
+  });
+  return new Promise((resolve, reject) => {
+    const request = https.request({
+      hostname: 'api.resend.com', path: '/emails', method: 'POST', timeout: 7000,
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      }
+    }, response => {
+      let data = '';
+      response.on('data', chunk => { data += chunk; if (data.length > 5000) response.destroy(); });
+      response.on('end', () => {
+        if (response.statusCode === 200 || response.statusCode === 201) return resolve(true);
+        reject(new Error('Mail provider returned HTTP ' + response.statusCode));
+      });
+    });
+    request.on('timeout', () => request.destroy(new Error('Mail provider timeout')));
+    request.on('error', reject);
+    request.end(payload);
+  });
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -69,11 +112,31 @@ module.exports = async (req, res) => {
     const lookupPath = basePath + '?maxRecords=1&filterByFormula=' + encodeURIComponent(formula);
     const existing = await airtableRequest('GET', lookupPath, key);
     if (existing.records && existing.records.length) return res.status(200).json({success:true,message:'这个邮箱已有报名申请，我们将按原申请联系您。'});
-    await airtableRequest('POST', basePath, key, {records:[{fields:{
+    const submittedAt = new Date().toISOString();
+    const created = await airtableRequest('POST', basePath, key, {records:[{fields:{
       Name:name, Email:email, WeChat:wechat, Identity:identity, Grade:grade,
       Topics:topics.join(', '), Question:question, Status:'Pending', Consent:'Yes',
-      Source:'aicocreatelife.com/events', SubmittedAt:new Date().toISOString()
+      Source:'aicocreatelife.com/events', SubmittedAt:submittedAt, NotificationStatus:'Not Sent'
     }}]});
+    const recordId = created.records && created.records[0] && created.records[0].id;
+    // Email is a best-effort side effect. Saving the registration is the source of truth.
+    let notificationStatus = 'Failed';
+    try {
+      await sendOrganizerNotification({
+        name, submittedAt,
+        testMode: email.endsWith('@example.com') && name.startsWith('NOTIFICATION TEST')
+      });
+      notificationStatus = 'Sent';
+    } catch (mailError) {
+      console.error('Event admin email notification failed:', mailError.message);
+    }
+    if (recordId) {
+      try {
+        await airtableRequest('PATCH', basePath, key, {records:[{id:recordId,fields:{NotificationStatus:notificationStatus}}]});
+      } catch (trackingError) {
+        console.error('Could not save notification status:', trackingError.message);
+      }
+    }
     return res.status(201).json({success:true,message:'报名申请已收到！席位尚待确认，我们将通过邮箱通知活动安排。'});
   } catch (error) {
     console.error('Event registration storage failure:', error.message);

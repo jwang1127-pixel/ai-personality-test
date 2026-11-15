@@ -75,10 +75,21 @@ async function init(){
  $('postBtn').disabled=true;const r=await db.from('posts').insert({author_id:activeUser.id,body});
  if(r.error)msg('postMsg',cleanError(r.error),true);else{$('postText').value='';msg('postMsg','发布成功');await loadPosts()}$('postBtn').disabled=false};
  $('reloadBtn').onclick=loadPosts;
- db.auth.onAuthStateChange((_event,_session)=>{window.setTimeout(refresh,0)});
+ db.auth.onAuthStateChange((event,_session)=>{
+   if(event==='PASSWORD_RECOVERY'){show('recoveryCard',true);show('authCard',false);show('memberCard',false);show('communityArea',false)}
+   else if($('recoveryCard').classList.contains('hidden'))window.setTimeout(refresh,0);
+ });
+ $('recoveryForm').onsubmit=async e=>{
+   e.preventDefault();const password=$('newPassword').value;
+   if(password.length<8){msg('recoveryMsg','密码至少8位',true);return}
+   $('recoveryBtn').disabled=true;
+   const r=await db.auth.updateUser({password});
+   if(r.error)msg('recoveryMsg',cleanError(r.error),true);
+   else {msg('recoveryMsg','新密码已保存，可以继续使用账户。');$('newPassword').value='';show('recoveryCard',false);await refresh()}
+   $('recoveryBtn').disabled=false;
+ };
  await refresh();
  const hash=new URLSearchParams(location.hash.substring(1));
  if(hash.has('error_description'))msg('authMsg',hash.get('error_description'),true);
- if(hash.has('type')&&hash.get('type')==='recovery'){const newPass=prompt('请输入新的社区登录密码（至少8位）');if(newPass&&newPass.length>=8){const r=await db.auth.updateUser({password:newPass});msg('authMsg',r.error?cleanError(r.error):'密码已更新',!!r.error)}}
 }
 window.addEventListener('DOMContentLoaded',init);

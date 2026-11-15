@@ -19,6 +19,10 @@
       "dest": "/events.html"
     },
     {
+      "src": "/community/?",
+      "dest": "/community.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/public/$1"
     }

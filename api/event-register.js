@@ -48,7 +48,7 @@ function sendOrganizerNotification({name, submittedAt, testMode}) {
       '请登录 Airtable → AI Personality Test Data → Event Registrations 查看详情。',
       '该申请状态为 Pending，尚未确认席位；请核对并单独通知报名者。',
       '这封邮件不包含报名者邮箱、微信号及自由填写的隐私信息。'
-    ].join('\\n')
+    ].join('\n')
   });
   return new Promise((resolve, reject) => {
     const request = https.request({

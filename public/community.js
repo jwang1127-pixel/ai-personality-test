@@ -7,6 +7,7 @@ let db=null, activeUser=null;
 const show=(id,yes)=>$(id).classList.toggle('hidden',!yes);
 const msg=(id,value,error=false)=>{const n=$(id);n.textContent=value;n.classList.toggle('hidden',!value);n.classList.toggle('error',error)};
 const cleanError=e=>String(e?.message||e||'出现错误，请稍后重试').replace(/https?:\/\/\S+/g,'[链接]');
+const reportLink=(kind,id)=>{const link=document.createElement('a');link.textContent='举报';link.className='small';link.href='mailto:jwang1127@gmail.com?subject='+encodeURIComponent('AI CoCreate Life 社区内容举报')+'&body='+encodeURIComponent(kind+' ID: '+id+'\n举报原因（请填写）：');return link};
 const busy=(yes)=>['loginBtn','signupBtn','resetBtn','postBtn'].forEach(id=>$(id).disabled=yes);
 async function refresh(){
   if(!db)return;
@@ -26,7 +27,8 @@ async function refresh(){
 async function authAction(kind){
  const email=$('email').value.trim(),password=$('password').value;
  if(!email||!$('email').validity.valid){msg('authMsg','请输入有效邮箱。',true);return}
- if(kind!=='reset' && (password.length<8||!$('adult').checked)){msg('authMsg','请确认已年满18岁，并输入至少8位密码。',true);return}
+ if(kind!=='reset' && password.length<8){msg('authMsg','请输入至少8位密码。',true);return}
+ if(kind==='signup' && !$('adult').checked){msg('authMsg','注册时请先确认已年满18岁并同意社区规则。',true);return}
  busy(true);try{
  let result;
  if(kind==='signup')result=await db.auth.signUp({email,password,options:{emailRedirectTo:location.origin+'/community'}});
@@ -47,13 +49,13 @@ async function loadPosts(){
  const wrap=document.createElement('div');wrap.className='post';
  const head=document.createElement('div');head.className='row';
  const title=document.createElement('strong');title.textContent=(p.profiles?.nickname||'成员')+' · '+new Date(p.created_at).toLocaleString('zh-CN');
- head.append(title);
+ head.append(title);head.append(reportLink('帖子',p.id));
  if(p.author_id===activeUser.id){const del=document.createElement('button');del.className='danger';del.textContent='删除帖子';del.onclick=async()=>{if(!confirm('确定删除这条帖子及其评论吗？'))return;const r=await db.from('posts').delete().eq('id',p.id);if(r.error)alert(cleanError(r.error));else await loadPosts()};head.append(del)}
  wrap.append(head);
  const body=document.createElement('p');body.className='postBody';body.textContent=p.body;wrap.append(body);
  const {data:comments,error:ce}=await db.from('comments').select('id,author_id,body,created_at,profiles(nickname)').eq('post_id',p.id).order('created_at',{ascending:true}).limit(100);
  if(ce){const warning=document.createElement('p');warning.textContent='评论暂时无法加载';wrap.append(warning)}
- for(const c of (comments||[])){const line=document.createElement('div');line.className='comment';const text=document.createElement('span');text.textContent=(c.profiles?.nickname||'成员')+'：'+c.body;line.append(text);
+ for(const c of (comments||[])){const line=document.createElement('div');line.className='comment';const text=document.createElement('span');text.textContent=(c.profiles?.nickname||'成员')+'：'+c.body;line.append(text);line.append(reportLink('评论',c.id));
  if(c.author_id===activeUser.id){const remove=document.createElement('button');remove.className='danger';remove.textContent='删除';remove.onclick=async()=>{const r=await db.from('comments').delete().eq('id',c.id);if(r.error)alert(cleanError(r.error));else await loadPosts()};line.append(remove)}
  wrap.append(line)}
  const form=document.createElement('form');const inp=document.createElement('textarea');inp.maxLength=1000;inp.required=true;inp.placeholder='发表回复（最多1000字）';inp.setAttribute('aria-label','回复帖子');

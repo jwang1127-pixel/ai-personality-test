@@ -11,7 +11,7 @@
 <div id="authMsg" class="message hidden" role="status" aria-live="polite"></div>
 <form id="authForm"><label for="email">邮箱</label><input id="email" type="email" autocomplete="email" maxlength="254" required>
 <label for="password">密码（至少8位）</label><input id="password" type="password" autocomplete="current-password" minlength="8" required>
-<label><input id="adult" type="checkbox" style="width:auto" required> 我已年满18岁，同意<a href="/community-rules.html" target="_blank" rel="noopener">社区规则及隐私说明</a></label>
+<label><input id="adult" type="checkbox" style="width:auto"> 我已年满18岁，同意<a href="/community-rules.html" target="_blank" rel="noopener">社区规则及隐私说明</a></label>
 <div class="row"><button type="submit" id="loginBtn">登录</button><button type="button" class="secondary" id="signupBtn">注册新账户</button><button type="button" class="secondary" id="resetBtn">忘记密码</button></div></form>
 <p class="muted">邮箱验证完成后即可登录；首次登录仍需管理员审核。注册不等于自动获准加入社区。</p></section>
 <section id="recoveryCard" class="card hidden"><h2>设置新的登录密码</h2><p>您已通过邮箱验证，请设置新密码。</p><form id="recoveryForm"><label for="newPassword">新密码（至少8位）</label><input id="newPassword" type="password" minlength="8" autocomplete="new-password" required><button type="submit" id="recoveryBtn">保存新密码</button></form><div id="recoveryMsg" class="message hidden" role="status"></div></section>

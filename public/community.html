@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>会员社区｜AI CoCreate Life · AI共创人生</title>
+<meta name="description" content="AI CoCreate Life 受邀成人会员社区：分享AI时代的个人成长目标、行动和反馈。">
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;color:#19334a;background:#f3f8fc}*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(125deg,#27b9e6,#247ba7);color:white;text-align:center;padding:22px 15px}header .en{letter-spacing:.18em;font-size:12px}header .zh{font-size:29px;font-weight:750;margin:6px 0 12px}a{color:#116d9a}header a{color:white}main{max-width:860px;margin:26px auto;padding:0 16px 40px}.card{background:#fff;border-radius:17px;box-shadow:0 4px 17px #173e5813;padding:22px;margin-bottom:16px}h1{margin:0 0 10px;font-size:28px}h2{font-size:19px;margin:0 0 12px}p{line-height:1.7}label{display:block;font-weight:600;margin:12px 0 5px}input,textarea{width:100%;padding:12px;font:inherit;border:1px solid #aec1d0;border-radius:8px}textarea{min-height:100px}button{padding:10px 18px;border-radius:8px;border:0;background:#116b99;color:white;font:inherit;font-weight:600;cursor:pointer;margin-top:10px}button.secondary{background:#e7f0f6;color:#174768}button.danger{background:#fff1f0;color:#a33227;border:1px solid #e4adab}button:disabled{opacity:.5;cursor:wait}.muted{color:#586e7d;font-size:14px}.message{padding:11px;border-radius:9px;background:#e9f4fc;margin:12px 0;white-space:pre-wrap}.error{background:#fff1ef;color:#9a352f}.hidden{display:none!important}.post{border-top:1px solid #dde9ef;padding-top:18px;margin-top:18px}.postBody{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7}.comment{border-left:3px solid #cae5f2;padding:8px 12px;margin:10px 0;background:#f6fafc;white-space:pre-wrap}.row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.small{font-size:13px}footer{text-align:center;padding:25px;color:#547083;font-size:13px}#postsArea button{font-size:13px;padding:6px 10px}#postsArea textarea{min-height:55px}
+</style></head>
+<body><header><div class="en">AI COCREATE LIFE</div><div class="zh">AI共创人生</div><a href="/">网站首页</a>　·　<a href="/events">公益活动</a></header>
+<main><section class="card"><h1>AI时代，我的下一步行动</h1><p>这是一个供受邀成人会员分享个人发展目标、真实行动与反馈的社区。注册和参加均免费。初期采取人工审核，只有通过审核的会员可以浏览和讨论。</p><p class="muted">请勿发布身份证号、住址、医疗资料或未经允许的他人信息。本站不面向18岁以下人员开放。</p></section>
+<section id="authCard" class="card"><h2>注册／登录</h2>
+<div id="authMsg" class="message hidden" role="status" aria-live="polite"></div>
+<form id="authForm"><label for="email">邮箱</label><input id="email" type="email" autocomplete="email" maxlength="254" required>
+<label for="password">密码（至少8位）</label><input id="password" type="password" autocomplete="current-password" minlength="8" required>
+<label><input id="adult" type="checkbox" style="width:auto"> 我已年满18岁，同意<a href="/community-rules.html" target="_blank" rel="noopener">社区规则及隐私说明</a></label>
+<div class="row"><button type="submit" id="loginBtn">登录</button><button type="button" class="secondary" id="signupBtn">注册新账户</button><button type="button" class="secondary" id="resetBtn">忘记密码</button></div></form>
+<p class="muted">邮箱验证完成后即可登录；首次登录仍需管理员审核。注册不等于自动获准加入社区。</p></section>
+<section id="recoveryCard" class="card hidden"><h2>设置新的登录密码</h2><p>您已通过邮箱验证，请设置新密码。</p><form id="recoveryForm"><label for="newPassword">新密码（至少8位）</label><input id="newPassword" type="password" minlength="8" autocomplete="new-password" required><button type="submit" id="recoveryBtn">保存新密码</button></form><div id="recoveryMsg" class="message hidden" role="status"></div></section>
+<section id="memberCard" class="card hidden"><div class="row"><h2>我的社区账户</h2><button class="secondary" id="logoutBtn">退出登录</button></div>
+<div id="memberMsg" class="message" role="status"></div><div id="nameArea" class="hidden"><label for="nickname">我的昵称</label><input id="nickname" maxlength="40"><button class="secondary" id="saveNameBtn">保存昵称</button></div></section>
+<section id="communityArea" class="hidden"><section class="card"><h2>分享一次行动</h2><form id="postForm"><label for="postText">我的问题、行动或进展</label><textarea id="postText" maxlength="2000" required placeholder="例如：我准备尝试用AI整理自己的职业转型选择……"></textarea><button id="postBtn" type="submit">发布到社区</button></form><div id="postMsg" role="status" class="muted"></div></section>
+<section class="card"><div class="row"><h2>成员分享与讨论</h2><button class="secondary" id="reloadBtn">刷新</button></div><div id="postsArea" aria-live="polite">正在加载……</div></section></section>
+<section class="card"><h2>隐私与管理</h2><p class="muted">社区帖子、评论和昵称可供通过审核的会员阅读；注册邮箱不向其他会员显示。活动报名和社区注册互不关联。您可自行删除本人帖子或评论，删除账号及有关个人资料需联系主办方核验后处理。</p><p><a href="/community-rules.html">阅读完整社区规则、隐私与账户管理说明</a></p><p>联系管理员：<a href="mailto:jwang1127@gmail.com?subject=AI%20CoCreate%20Life%20%E7%A4%BE%E5%8C%BA%E7%94%B3%E8%AF%B7">jwang1127@gmail.com</a></p><p class="muted">举报违规内容时请提供帖子或评论编号与简要原因，请勿在邮件中发送密码或敏感证件资料。用户查询或删除账户时请使用注册邮箱联系，管理员核对身份后处理。</p><p class="muted">第一版为受邀成人的小规模验证社区，不提供公开个人主页、私信及图片上传。</p></section></main>
+<footer>AI CoCreate Life｜AI共创人生 · 受邀成人会员社区</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0" defer></script>
+<script defer src="/community.js"></script>
+</body></html>

@@ -2,7 +2,7 @@
 // Private endpoint: Supabase Auth confirmation trigger -> Resend -> owner only.
 // No Supabase service-role key or Resend credential is exposed to the browser.
 const { timingSafeEqual } = require('node:crypto');
-const SAFE_EMAIL = /^[^\\s@]{1,64}@[^\\s@]{1,190}\\.[A-Za-z]{2,}$/;
+const SAFE_EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[A-Za-z]{2,}$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 module.exports = async function handler(req,res) {
   res.setHeader('Cache-Control','no-store');
@@ -18,7 +18,7 @@ module.exports = async function handler(req,res) {
   if (!process.env.RESEND_API_KEY || !process.env.FROM_EMAIL) return res.status(503).json({ok:false,error:'Email service not configured'});
   const message = test ?
     '这是一封AI CoCreate Life新会员自动通知的系统测试邮件。没有真实会员等待审核。' :
-    '有一位社区用户已完成邮箱验证，等待人工审核。\\n\\n注册邮箱：'+email+'\\n会员ID：'+user_id+'\\n\\n请前往 Supabase Dashboard → Authentication → Users 核对邮箱和会员ID，再到 Table Editor → public.profiles 决定是否批准。\\n\\nhttps://supabase.com/dashboard/project/kqjvyzousekhjdaihmnl/editor\\n\\n提醒：注册不等于批准；请勿自动把 approved 改成 true。';
+    '有一位社区用户已完成邮箱验证，等待人工审核。\n\n注册邮箱：'+email+'\n会员ID：'+user_id+'\n\n请前往 Supabase Dashboard → Authentication → Users 核对邮箱和会员ID，再到 Table Editor → public.profiles 决定是否批准。\n\nhttps://supabase.com/dashboard/project/kqjvyzousekhjdaihmnl/editor\n\n提醒：注册不等于批准；请勿自动把 approved 改成 true。';
   try {
     const response=await fetch('https://api.resend.com/emails',{
       method:'POST',
